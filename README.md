@@ -1,29 +1,6 @@
-# go-ui
-
-## Project setup
-```
-yarn install
-```
-
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Run your unit tests
-```
-yarn test:unit
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## go ui 组件库
+项目技术栈：
+* `vue` + `vue-router`
+* `scss`
+### `CSS`约定
+* 组件的类名要以`go-`开头
