@@ -19,6 +19,5 @@ export default {
 .go-button {
   outline: none;
   border: none;
-
 }
 </style>
