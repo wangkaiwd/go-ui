@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import App from './App.vue';
 import router from './router';
-import '@/assets/styles/reset.scss';
+import '@/assets/styles/index.scss';
 // import '@/shared/autoRegister';
 import GoButton from '@/components/button/button';
 import GoIcon from '@/components/icon/icon';
