@@ -1,15 +1,15 @@
 <template>
   <div class="example">
-    <go-button class="button">
+    <go-button class="button" disabled>
+      Button
+    </go-button>
+    <go-button @click="onClick" class="button" color="primary" disabled>
+      Primary
+    </go-button>
+    <go-button class="button" color="secondary" disabled>
       Default Button
     </go-button>
-    <go-button class="button" color="primary">
-      Default Button
-    </go-button>
-    <go-button class="button" color="secondary">
-      Default Button
-    </go-button>
-    <go-button class="button" color="info">
+    <go-button @click="onClick" class="button" color="info">
       Default Button
     </go-button>
     <go-button class="button" color="success">
@@ -31,6 +31,11 @@ export default {
   name: 'Example',
   data () {
     return {};
+  },
+  methods: {
+    onClick () {
+      console.log('click');
+    }
   }
 };
 </script>

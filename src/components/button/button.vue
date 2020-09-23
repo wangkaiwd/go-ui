@@ -1,5 +1,11 @@
 <template>
-  <button class="go-button" :class="color">
+  <button
+    class="go-button"
+    v-bind="$attrs"
+    v-on="$listeners"
+    :class="[color,{ disabled }]"
+    :disabled="disabled"
+  >
     <slot></slot>
   </button>
 </template>
@@ -8,6 +14,7 @@
 export default {
   name: 'GoButton',
   props: {
+    inheritAttrs: false,
     color: {
       type: String,
       validator (value) {
@@ -22,7 +29,15 @@ export default {
         ].includes(value);
       },
       default: 'default'
-    }
+    },
+    disabled: {
+      type: Boolean,
+      default: false
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
   },
   data () {
     return {};
@@ -45,49 +60,55 @@ export default {
   box-shadow: 0 4px 6px rgba(50, 50, 93, .11), 0 1px 3px rgba(0, 0, 0, .08);
   &.default {
     background-color: $default;
-    &:hover {
+    &:hover:not(.disabled) {
       background-color: darken($default, 8%);
     }
   }
   &.primary {
     background-color: $primary;
-    &:hover {
+    &:hover:not(.disabled) {
       background-color: darken($primary, 8%);
     }
   }
   &.secondary {
     background-color: $secondary;
     color: $gray900;
-    &:hover {
+    &:hover:not(.disabled) {
       background-color: darken($secondary, 8%);
     }
   }
   &.info {
     background-color: $info;
-    &:hover {
+    &:hover:not(.disabled) {
       background-color: darken($info, 8%);
     }
   }
   &.success {
     background-color: $success;
-    &:hover {
+    &:hover:not(.disabled) {
       background-color: darken($success, 8%);
     }
   }
   &.danger {
     background-color: $danger;
-    &:hover {
+    &:hover:not(.disabled) {
       background-color: darken($danger, 8%);
     }
   }
   &.warning {
     background-color: $warning;
-    &:hover {
+    &:hover:not(.disabled) {
       background-color: darken($warning, 8%);
     }
   }
+  &.disabled, &:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+    box-shadow: none;
+  }
   &:hover {
     transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(50, 50, 93, .11), 0 1px 3px rgba(0, 0, 0, .08);
   }
 }
 </style>
