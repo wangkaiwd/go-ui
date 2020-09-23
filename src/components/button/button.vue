@@ -1,20 +1,22 @@
 <template>
-  <button class="go-button"></button>
+  <button class="go-button">
+    button
+  </button>
 </template>
 
 <script>
 export default {
-  name: "GoButton",
+  name: 'GoButton',
   props: {
     type: {}
   },
-  data() {
+  data () {
     return {};
   }
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 @import "~@/assets/styles/vars.scss";
 .go-button {
   outline: none;

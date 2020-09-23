@@ -1,16 +1,16 @@
-import Vue from "vue";
-import App from "./App.vue";
-import router from "./router";
-import "@/assets/styles/reset.scss";
+import Vue from 'vue';
+import App from './App.vue';
+import router from './router';
+import '@/assets/styles/reset.scss';
+// import '@/shared/autoRegister';
+import GoButton from '@/components/button/button';
+import GoIcon from '@/components/icon/icon';
 
-import GoButton from "@/components/go-button/go-button";
-import GoIcon from "@/components/go-icon/go-icon";
-
-Vue.use(GoButton.name, GoButton);
-Vue.use(GoIcon.name, GoIcon);
+Vue.component(GoButton.name, GoButton);
+Vue.component(GoIcon.name, GoIcon);
 Vue.config.productionTip = false;
 
 new Vue({
   router,
   render: h => h(App)
-}).$mount("#app");
+}).$mount('#app');

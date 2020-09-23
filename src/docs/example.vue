@@ -1,11 +1,15 @@
 <template>
-  <div class="example"></div>
+  <div class="example">
+    <go-button></go-button>
+    <go-icon name="complete"></go-icon>
+  </div>
 </template>
 
 <script>
+
 export default {
-  name: "Example",
-  data() {
+  name: 'Example',
+  data () {
     return {};
   }
 };
@@ -13,5 +17,6 @@ export default {
 
 <style lang="scss" scoped>
 .example {
+  height: 100%;
 }
 </style>
