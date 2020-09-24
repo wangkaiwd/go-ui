@@ -5,11 +5,13 @@
     class="go-icon"
     aria-hidden="true"
   >
-    <use :xlink:href="`#i-${name}`"></use>
+    <use :xlink:href="`#${name}`"></use>
   </svg>
 </template>
 
 <script>
+import '@/shared/svg';
+
 export default {
   name: 'GoIcon',
   inheritAttrs: false,

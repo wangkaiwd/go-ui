@@ -13,6 +13,7 @@
       Default Button
     </go-button>
     <go-button class="button" color="success">
+      <go-icon name="chart-pie"></go-icon>
       Default Button
     </go-button>
     <go-button class="button" color="danger">
@@ -20,8 +21,8 @@
     </go-button>
     <go-button class="button" color="warning">
       Default Button
+      <go-icon name="complete"></go-icon>
     </go-button>
-    <go-icon name="complete"></go-icon>
   </div>
 </template>
 
@@ -46,7 +47,7 @@ export default {
   padding: 20px;
   background-color: #f5f7f9;
   .button + .button {
-    margin-left: 4px;
+    margin-left: 8px;
   }
 }
 </style>

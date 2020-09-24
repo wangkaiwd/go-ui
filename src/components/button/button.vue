@@ -6,6 +6,9 @@
     :class="[color,{ disabled }]"
     :disabled="disabled"
   >
+    <span v-if="icon" class="go-button-icon-left">
+      <go-icon :name="icon"></go-icon>
+    </span>
     <slot></slot>
   </button>
 </template>
@@ -15,6 +18,9 @@ export default {
   name: 'GoButton',
   props: {
     inheritAttrs: false,
+    icon: {
+      type: String
+    },
     color: {
       type: String,
       validator (value) {
@@ -41,6 +47,21 @@ export default {
   },
   data () {
     return {};
+  },
+  mounted () {
+    this.setClassForIcon();
+  },
+  methods: {
+    setClassForIcon () {
+      // FIXME: has more nest resolution ?
+      this.$slots.default.forEach((vNode, i, array) => {
+        if (vNode.tag?.includes('GoIcon') && i === 0) {
+          vNode.elm.classList.add('go-button-icon-left');
+        } else if (vNode.tag?.includes('GoIcon') && i === array.length - 1) {
+          vNode.elm.classList.add('go-button-icon-right');
+        }
+      });
+    }
   }
 };
 </script>
@@ -48,6 +69,9 @@ export default {
 <style lang="scss" scoped>
 @import "~@/assets/styles/vars.scss";
 .go-button {
+  display: inline-flex;
+  vertical-align: top;
+  align-items: center;
   outline: none;
   border: none;
   color: white;
@@ -58,6 +82,12 @@ export default {
   cursor: pointer;
   transition: transform 0.2s ease;
   box-shadow: 0 4px 6px rgba(50, 50, 93, .11), 0 1px 3px rgba(0, 0, 0, .08);
+  &-icon-left {
+    margin-right: 8px;
+  }
+  &-icon-right {
+    margin-left: 8px;
+  }
   &.default {
     background-color: $default;
     &:hover:not(.disabled) {
