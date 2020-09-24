@@ -16,7 +16,7 @@
       <go-icon name="chart-pie"></go-icon>
       Default Button
     </go-button>
-    <go-button class="button" color="danger">
+    <go-button :loading="loading" class="button" color="danger">
       Default Button
     </go-button>
     <go-button class="button" color="warning">
@@ -31,11 +31,17 @@
 export default {
   name: 'Example',
   data () {
-    return {};
+    return {
+      loading: false
+    };
   },
   methods: {
     onClick () {
+      this.loading = true;
       console.log('click');
+      setTimeout(() => {
+        this.loading = false;
+      }, 2000);
     }
   }
 };

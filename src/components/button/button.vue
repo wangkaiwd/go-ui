@@ -3,11 +3,14 @@
     class="go-button"
     v-bind="$attrs"
     v-on="$listeners"
-    :class="[color,{ disabled }]"
+    :class="[color,{ disabled: disabled || loading }]"
     :disabled="disabled"
   >
-    <span v-if="icon" class="go-button-icon-left">
+    <span v-if="icon && !loading" class="go-button-icon-left">
       <go-icon :name="icon"></go-icon>
+    </span>
+    <span v-if="loading" class="go-button-icon-loading">
+      <go-icon name="loading"></go-icon>
     </span>
     <slot></slot>
   </button>
@@ -53,7 +56,7 @@ export default {
   },
   methods: {
     setClassForIcon () {
-      // FIXME: has more nest resolution ?
+      // FIXME: has more graceful resolution ?
       this.$slots.default.forEach((vNode, i, array) => {
         if (vNode.tag?.includes('GoIcon') && i === 0) {
           vNode.elm.classList.add('go-button-icon-left');
@@ -82,8 +85,11 @@ export default {
   cursor: pointer;
   transition: transform 0.2s ease;
   box-shadow: 0 4px 6px rgba(50, 50, 93, .11), 0 1px 3px rgba(0, 0, 0, .08);
-  &-icon-left {
+  &-icon-left, &-icon-loading {
     margin-right: 8px;
+  }
+  &-icon-loading {
+    animation: spin 1.2s linear infinite;
   }
   &-icon-right {
     margin-left: 8px;
@@ -139,6 +145,14 @@ export default {
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 6px rgba(50, 50, 93, .11), 0 1px 3px rgba(0, 0, 0, .08);
+  }
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 </style>
