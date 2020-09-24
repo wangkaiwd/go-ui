@@ -23,16 +23,25 @@
       Default Button
       <go-icon name="complete"></go-icon>
     </go-button>
+
+    <ul>
+      <li v-for="icon in iconList" :key="icon">
+        <go-icon class="icon-item" :name="icon"></go-icon>
+        {{ icon }}
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
+import iconList from '@/icon.json';
 
 export default {
   name: 'Example',
   data () {
     return {
-      loading: false
+      loading: false,
+      iconList
     };
   },
   methods: {
@@ -54,6 +63,9 @@ export default {
   background-color: #f5f7f9;
   .button + .button {
     margin-left: 8px;
+  }
+  .icon-item {
+    font-size: 18px;
   }
 }
 </style>

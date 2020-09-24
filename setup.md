@@ -7,4 +7,7 @@
 
 ### 制作`logo`
 * [logo maker](https://hatchful.shopify.com/)
-* [Argon Design](https://demos.creative-tim.com/argon-design-system-react/?_ga=2.199100908.278220080.1600397742-1664802973.1600397742#/documentation/overview)
+
+### 问题记录
+#### `Button`
+* 如何添加`loading`出现时的动画，而不至于效果太生硬？
