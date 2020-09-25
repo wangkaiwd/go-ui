@@ -15,6 +15,6 @@ export default {
 
 <style lang="scss" scoped>
 .go-footer {
-
+  padding: 24px 50px;
 }
 </style>

@@ -15,6 +15,8 @@ export default {
 
 <style lang="scss" scoped>
 .go-main {
-
+  flex: 1;
+  min-height: 120px;
+  line-height: 120px;
 }
 </style>

@@ -15,6 +15,8 @@ export default {
 
 <style lang="scss" scoped>
 .go-header {
-
+  height: 64px;
+  line-height: 64px;
+  padding: 0 50px;
 }
 </style>

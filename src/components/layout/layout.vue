@@ -15,6 +15,7 @@ export default {
 
 <style lang="scss" scoped>
 .go-layout {
-
+  display: flex;
+  flex-direction: column;
 }
 </style>
