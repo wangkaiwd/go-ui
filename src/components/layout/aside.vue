@@ -1,5 +1,5 @@
 <template>
-  <div class="go-aside">
+  <div class="go-aside" :style="{width: width + 'px'}">
     <slot></slot>
   </div>
 </template>
@@ -7,6 +7,12 @@
 <script>
 export default {
   name: 'GoAside',
+  props: {
+    width: {
+      type: Number,
+      default: 200
+    }
+  },
   data () {
     return {};
   },
@@ -15,6 +21,5 @@ export default {
 
 <style lang="scss" scoped>
 .go-aside {
-
 }
 </style>
