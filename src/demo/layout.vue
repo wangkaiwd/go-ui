@@ -28,6 +28,23 @@
         Footer
       </go-footer>
     </go-layout>
+
+    <go-layout class="layout">
+      <go-header class="header">
+        Header
+      </go-header>
+      <go-layout>
+        <go-main class="main">
+          Main
+        </go-main>
+        <go-aside class="aside">
+          aside
+        </go-aside>
+      </go-layout>
+      <go-footer class="footer">
+        Footer
+      </go-footer>
+    </go-layout>
   </div>
 </template>
 
