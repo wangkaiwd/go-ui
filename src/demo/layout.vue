@@ -45,6 +45,25 @@
         Footer
       </go-footer>
     </go-layout>
+
+    <go-layout class="layout">
+      <go-aside class="aside">
+        aside
+      </go-aside>
+      <go-layout>
+        <go-header class="header">
+          Header
+        </go-header>
+        <go-layout>
+          <go-main class="main">
+            Main
+          </go-main>
+        </go-layout>
+        <go-footer class="footer">
+          Footer
+        </go-footer>
+      </go-layout>
+    </go-layout>
   </div>
 </template>
 

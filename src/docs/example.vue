@@ -24,5 +24,6 @@ export default {
   height: 100%;
   padding: 20px;
   background-color: #f5f7f9;
+  overflow: auto;
 }
 </style>

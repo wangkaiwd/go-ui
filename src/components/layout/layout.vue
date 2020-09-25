@@ -36,6 +36,7 @@ export default {
 <style lang="scss" scoped>
 .go-layout {
   display: flex;
+  flex: 1;
   flex-direction: column;
   &-has-aside {
     flex-direction: row;
