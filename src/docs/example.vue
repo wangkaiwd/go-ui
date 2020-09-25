@@ -1,16 +1,18 @@
 <template>
   <div class="example">
-    <demo-layout></demo-layout>
+    <!--    <demo-layout></demo-layout>-->
+    <demo-grid></demo-grid>
   </div>
 </template>
 
 <script>
 
 import DemoLayout from '@/demo/layout';
+import DemoGrid from '@/demo/grid';
 
 export default {
   name: 'Example',
-  components: { DemoLayout },
+  components: { DemoGrid, DemoLayout },
   data () {
     return {};
   },

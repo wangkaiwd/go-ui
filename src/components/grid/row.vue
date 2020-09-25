@@ -33,6 +33,6 @@ export default {
 
 <style lang="scss" scoped>
 .go-row {
-
+  display: flex;
 }
 </style>
