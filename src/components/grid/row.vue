@@ -1,5 +1,5 @@
 <template>
-  <div class="go-row">
+  <div class="go-row" :style="{marginLeft: -gutter + 'px'}">
     <slot></slot>
   </div>
 </template>
@@ -21,9 +21,9 @@ export default {
   methods: {
     checkChildren () {
       this.$children.forEach((child) => {
-        const { name } = child;
+        const { name } = child.$options;
         if (name !== 'GoCol') {
-          console.log('Row child component must be Col');
+          console.warn('Row child component must be Col');
         }
       });
     }
@@ -33,6 +33,5 @@ export default {
 
 <style lang="scss" scoped>
 .go-row {
-  display: flex;
 }
 </style>

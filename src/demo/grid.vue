@@ -1,9 +1,32 @@
 <template>
   <div class="demo-grid">
-    <go-row>
-      <go-col :span="8">1</go-col>
-      <go-col :span="8">2</go-col>
-      <go-col :span="8">3</go-col>
+    <!--
+      col中如何接收gutter属性：
+      1. this.$parent
+      2. parent: assign value to each $children instance
+      3. provide/inject
+   -->
+    <go-row :gutter="gutter">
+      <go-col class="col" :span="8">
+        <div class="inner">
+          1
+        </div>
+      </go-col>
+      <go-col class="col" :span="8">
+        <div class="inner">
+          2
+        </div>
+      </go-col>
+      <go-col class="col" :span="8">
+        <div class="inner">
+          3
+        </div>
+      </go-col>
+      <go-col class="col" :span="8">
+        <div class="inner">
+          4
+        </div>
+      </go-col>
     </go-row>
   </div>
 </template>
@@ -12,13 +35,24 @@
 export default {
   name: 'DemoGrid',
   data () {
-    return {};
+    return {
+      gutter: 16
+    };
   },
 };
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/styles/vars.scss";
 .demo-grid {
-
+  .col {
+    padding: 4px 0;
+  }
+  .inner {
+    padding: 8px 0;
+    text-align: center;
+    color: #fff;
+    background-color: $default;
+  }
 }
 </style>
