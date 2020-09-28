@@ -1,7 +1,7 @@
 <template>
   <div
     class="go-col"
-    :class="`go-col-${span}`"
+    :class="colClasses"
     :style="colStyles"
   >
     <slot></slot>
@@ -9,12 +9,26 @@
 </template>
 
 <script>
+const dimensions = ['xs', 'sm', 'md', 'lg'];
+// dimension: 1. 尺寸；规格 2. 维度
 export default {
   name: 'GoCol',
   props: {
     span: {
       type: Number,
       default: 24
+    },
+    xs: {
+      type: Number
+    },
+    sm: {
+      type: Number
+    },
+    md: {
+      type: Number
+    },
+    lg: {
+      type: Number
     }
   },
   data () {
@@ -28,6 +42,15 @@ export default {
       return {
         paddingLeft: this.gutter + 'px'
       };
+    },
+    colClasses () {
+      return dimensions.reduce((accumulator, dimension) => {
+        const value = this[dimension];
+        if (value) {
+          accumulator.push(`go-col-${dimension}-${value}`);
+        }
+        return accumulator;
+      }, [`go-col-${this.span}`]);
     }
   }
 };

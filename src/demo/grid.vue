@@ -7,7 +7,7 @@
       3. provide/inject
    -->
     <go-row :gutter="gutter">
-      <go-col class="col" :span="8">
+      <go-col class="col" :lg="12" :span="8">
         <div class="inner">
           1
         </div>
