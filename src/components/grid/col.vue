@@ -66,5 +66,47 @@ export default {
       width: calc(#{$i} / 24 * 100%);
     }
   }
+  @media screen and (min-width: 1600px) {
+    @for $i from 1 through 24 {
+      &-xxl-#{$i} {
+        width: calc(#{$i} / 24 * 100%);
+      }
+    }
+  }
+  @media screen and (min-width: 1200px) {
+    @for $i from 1 through 24 {
+      &-xl-#{$i} {
+        width: calc(#{$i} / 24 * 100%);
+      }
+    }
+  }
+  @media screen and (min-width: 992px) {
+    @for $i from 1 through 24 {
+      &-lg-#{$i} {
+        width: calc(#{$i} / 24 * 100%);
+      }
+    }
+  }
+  @media screen and (min-width: 786px) {
+    @for $i from 1 through 24 {
+      &-md-#{$i} {
+        width: calc(#{$i} / 24 * 100%);
+      }
+    }
+  }
+  @media screen and (min-width: 576px) {
+    @for $i from 1 through 24 {
+      &-sm-#{$i} {
+        width: calc(#{$i} / 24 * 100%);
+      }
+    }
+  }
+  @media screen and (max-width: 576px) {
+    @for $i from 1 through 24 {
+      &-xs-#{$i} {
+        width: calc(#{$i} / 24 * 100%);
+      }
+    }
+  }
 }
 </style>

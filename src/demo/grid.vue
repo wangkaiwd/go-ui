@@ -7,22 +7,22 @@
       3. provide/inject
    -->
     <go-row :gutter="gutter">
-      <go-col class="col" :lg="12" :span="8">
+      <go-col class="col" :xs="6" :md="10" :span="8">
         <div class="inner">
           1
         </div>
       </go-col>
-      <go-col class="col" :span="8">
+      <go-col class="col" :xs="6" :md="7" :span="8">
         <div class="inner">
           2
         </div>
       </go-col>
-      <go-col class="col" :span="8">
+      <go-col class="col" :xs="6" :md="7" :span="8">
         <div class="inner">
           3
         </div>
       </go-col>
-      <go-col class="col" :span="8">
+      <go-col class="col" :xs="6" :span="8">
         <div class="inner">
           4
         </div>
