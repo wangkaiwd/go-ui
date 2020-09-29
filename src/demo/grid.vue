@@ -1,11 +1,5 @@
 <template>
   <div class="demo-grid">
-    <!--
-      col中如何接收gutter属性：
-      1. this.$parent
-      2. parent: assign value to each $children instance
-      3. provide/inject
-   -->
     <go-row :gutter="gutter">
       <go-col class="col" :xs="6" :md="10" :span="8">
         <div class="inner">
