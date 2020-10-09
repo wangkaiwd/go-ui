@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import App from './App.vue';
-import router from './router';
+import router from './docs/router';
 import '@/assets/styles/index.scss';
 import GoButton from '@/components/button/button';
 import GoIcon from '@/components/icon/icon';
