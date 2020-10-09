@@ -34,6 +34,11 @@ export const routes = [
         name: 'Grid',
         component: () => import('@/demo/grid')
       },
+      {
+        path: '/lazy-load',
+        name: 'LazyLoad',
+        component: () => import('@/demo/lazy-load')
+      },
     ]
   }
 ];
