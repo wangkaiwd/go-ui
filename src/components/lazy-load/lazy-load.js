@@ -1,5 +1,6 @@
 import { getScrollParent } from '@/components/lazy-load/util';
 
+// diagram: https://excalidraw.com/#json=5687798237495296,zq8RZQuzBC1jbVIr9C7lDw
 const loadItems = [];
 // throttle: 每等待的毫秒之间最多调用函数一次
 const throttle = (handler, time = 0) => {
@@ -13,7 +14,6 @@ const throttle = (handler, time = 0) => {
   };
 };
 const onScroll = function (e) {
-  console.log('scroll-outer');
   loadItems.forEach(({ el, src }) => {
     if (!el.state && inView(e.target, el)) {
       load(el, src);
