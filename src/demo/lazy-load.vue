@@ -2,8 +2,7 @@
   <div class="lazy-load">
     <h3>图片懒加载</h3>
     <div class="container">
-      <img class="img" v-for="(img,index) in images" v-lazy="img" :key="index" :src="img" alt="">
-      <!--      <div class="img" v-for="(img,index) in images" v-lazy="img" :key="index">{{ img }}</div>-->
+      <img class="img" v-for="(img,index) in images" v-lazy="img" :key="index" alt="">
     </div>
   </div>
 </template>
@@ -67,6 +66,7 @@ export default {
   }
   .img {
     width: 200px;
+    height: 150px;
     vertical-align: top;
   }
 }
