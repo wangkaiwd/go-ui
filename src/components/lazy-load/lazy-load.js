@@ -1,8 +1,24 @@
 import { getScrollParent } from '@/components/lazy-load/util';
 
+const loadItems = [];
+// throttle: 每等待的毫秒之间最多调用函数一次
+const throttle = (handler, time = 0) => {
+  let timerId = null;
+  return function (...args) {
+    if (timerId) {return;}
+    timerId = setTimeout(() => {
+      handler(...args);
+      timerId = null;
+    }, time);
+  };
+};
 const onScroll = function (e) {
-  // console.log('scrollTop', e);
-  // console.log('scroll');
+  console.log('scroll-outer');
+  loadItems.forEach(({ el, src }) => {
+    if (!el.state && inView(e.target, el)) {
+      load(el, src);
+    }
+  });
 };
 const inView = function (parent, el) {
   const { height, top } = parent.getBoundingClientRect();
@@ -17,17 +33,24 @@ function asyncImageLoader (src) {
     const image = new Image();
     image.src = src;
     image.addEventListener('load', resolve);
-    image.addEventListener('error', resolve);
+    image.addEventListener('error', reject);
   });
 }
 
 const load = function (el, src) {
   const { loading, error } = el.options;
   el.src = loading;
-  asyncImageLoader(src).then(() => {
-    el.src = src;
-    el.loaded = true;
-  }, () => {el.src = error;});
+  el.state = 'loading';
+  asyncImageLoader(src).then(
+    () => {
+      el.src = src;
+      el.state = 'loaded';
+    },
+    () => {
+      el.src = error;
+      el.state = 'error';
+    }
+  );
 };
 
 // illustrate: https://excalidraw.com/#json=5662514637438976,7QpXQ40OSUH8xaw1jbiH-Q
@@ -40,15 +63,22 @@ const load = function (el, src) {
 //  2. 通过dom操作计算出元素是否在图片加载区域内
 //  3. 如果在加载区域内的话，通过new Image()或者document.createElement('img')来创建一个"假"的img标签
 //  4. img标签的src为真实的src,用于模拟加载过程，在加载成功和失败后分别进行对应的处理
+//  5. 监听父元素的滚动事件，每次滚动都要计算所有添加指令的图片子元素是否在容器中，如果在并且没有加载过的话，进行加载
+//  6. 通过节流优化滚动事件
 const install = (Vue, options) => {
   Vue.directive('lazy', {
     inserted (el, binding) {
       el.options = options;
       const parent = getScrollParent(el);
-      parent.addEventListener('scroll', onScroll);
-      if (!el.loaded && inView(parent, el)) {
+      if (!el.state && inView(parent, el)) {
         load(el, binding.value);
       }
+      // 要对每一个el都进行判断
+      // 在滚动的时候继续进行加载文件
+      loadItems.push({ el, src: binding.value });
+      const scroll = throttle(onScroll, 300);
+      parent.removeEventListener('scroll', scroll);
+      parent.addEventListener('scroll', scroll);
     }
   });
 };

@@ -1,6 +1,6 @@
 <template>
   <div class="lazy-load">
-    <h3>图片懒加载</h3>
+    <h3>image Lazy Load</h3>
     <div class="container">
       <img class="img" v-for="(img,index) in images" v-lazy="img" :key="index" alt="">
     </div>
