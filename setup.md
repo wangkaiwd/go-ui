@@ -36,7 +36,6 @@ lifecycle hooks:
 
 思路整理： 
 1. 使用方式
-
     ```jsx
     import Vue from 'vue'
     import LazyLoad from 'lazy-load'
@@ -47,7 +46,6 @@ lifecycle hooks:
     	loading: '@/demo/loading.png'
     })
     ```
-
 2. 文档阅读
     1. `Vue.use` 方法
     2. `custom directive` 
