@@ -25,6 +25,7 @@ Vue.component(GoCol.name, GoCol);
 Vue.use(GoLazyLoad, { preload: 1.3, error: require('@/demo/error.png'), loading: require('@/demo/loading.png') });
 Vue.config.productionTip = false;
 
+
 new Vue({
   router,
   render: h => h(App)

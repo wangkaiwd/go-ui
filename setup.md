@@ -28,6 +28,12 @@ lifecycle hooks:
 * inserted: 在绑定元素已经插入到它的父节点时调用(这只保证父节点存在，不一定在`document`中)
 * scrollHeight: 测量一个元素内容高度的只读属性，包括由于`overflow`在屏幕上不可见的内容
 
+知识点：  
+* export 导出的变量，在文件内更新以后，导出的变量也会更新
+* directive hooks: 
+  * bind: 此时还不能获取到绑定指令的元素，可以通过`Vue.$nextTick`来保证`DOM`更新后获取最新的`DOM`
+  * inserted: 在绑定元素已经被插入到它的父节点的时候调用(这只能保证父节点存在，不一定在文档内)
+
 思路整理： 
 1. 使用方式
 
