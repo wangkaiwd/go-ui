@@ -28,10 +28,29 @@ lifecycle hooks:
 * inserted: 在绑定元素已经插入到它的父节点时调用(这只保证父节点存在，不一定在`document`中)
 * scrollHeight: 测量一个元素内容高度的只读属性，包括由于`overflow`在屏幕上不可见的内容
 
-思路：
-  1. 找到设置overflow的父元素
-  2. 通过dom操作计算出元素是否在图片加载区域内
-  3. 如果在加载区域内的话，通过new Image()或者document.createElement('img')来创建一个"假"的img标签
-  4. img标签的src为真实的src,用于模拟加载过程，在加载成功和失败后分别进行对应的处理
-  5. 监听父元素的滚动事件，每次滚动都要计算所有添加指令的图片子元素是否在容器中，如果在并且没有加载过的话，进行加载
-  6. 通过节流优化滚动事件
+思路整理： 
+1. 使用方式
+
+    ```jsx
+    import Vue from 'vue'
+    import LazyLoad from 'lazy-load'
+    // 之后就可以全局通过`v-lazy`指令进行使用
+    Vue.use(LazyLoad,{
+    	preload: 1.3,
+    	error: '@/demo/error.png',
+    	loading: '@/demo/loading.png'
+    })
+    ```
+
+2. 文档阅读
+    1. `Vue.use` 方法
+    2. `custom directive` 
+3. 根据绑定指令元素查找其最近的设置`overflow:scroll` 的父元素，作为滚动容器
+4. 根据`preload` 计算出需要加载图片的区域
+5. 检查所有绑定指令的元素是否在加载区域内
+6. 如果在加载区域内，需要进行异步加载，异步加载过程如下：
+    1. 创建一个假的`img` HTML元素，地址为真实图片的地址
+    2. 监听`img` HTML元素的事件，模拟其加载过程
+    3. 加载完成后，为真实的`img` 标签设置`src` 的值
+7. 监听父元素的滚动事件，滚动后，判断所有绑定指令的元素是否在加载区域内，如果是，调用`load` 
+8. 滚动事件比较耗费性能，可以通过节流函数来进行优化，特定时间内只执行一次滚动函数
