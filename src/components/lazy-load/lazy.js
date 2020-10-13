@@ -1,5 +1,5 @@
 import { _Vue } from '@/components/lazy-load/index';
-import ReactiveListener from '@/components/lazy-load/reactiveListener';
+import ReactiveListener from '@/components/lazy-load/listener';
 
 class Lazy {
   constructor (options) {
