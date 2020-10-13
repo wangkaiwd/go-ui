@@ -1,8 +1,8 @@
-import { _Vue } from '@/components/lazy-load/index';
 import ReactiveListener from '@/components/lazy-load/listener';
 
 class Lazy {
-  constructor (options) {
+  constructor (Vue, options) {
+    this.Vue = Vue;
     this.options = options;
     this.listenerQueue = [];
     this.hasBindScroll = false;
@@ -13,7 +13,7 @@ class Lazy {
 
   add (el, binding) {
     // 确保能获取到dom元素
-    _Vue.nextTick(() => {
+    this.Vue.nextTick(() => {
       this.parent = this.getScrollParent(el);
       if (!this.hasBindScroll) {
         this.parent.addEventListener('scroll', this.lazyHandler);
