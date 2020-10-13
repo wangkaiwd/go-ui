@@ -7,7 +7,8 @@ const install = (Vue, options) => {
   _Vue = Vue;
   const lazy = new Lazy(options);
   Vue.directive('lazy', {
-    bind: lazy.add.bind(lazy)
+    bind: lazy.add.bind(lazy),
+    unbind: lazy.destroy.bind(lazy)
   });
 };
 

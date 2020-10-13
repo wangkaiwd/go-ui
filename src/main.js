@@ -11,7 +11,7 @@ import GoFooter from '@/components/layout/footer';
 import GoAside from '@/components/layout/aside';
 import GoCol from '@/components/grid/col';
 import GoRow from '@/components/grid/row';
-import GoLazyLoad from '@/components/lazy-load/lazy-load';
+import GoLazyLoad from '@/components/lazy-load';
 
 Vue.component(GoButton.name, GoButton);
 Vue.component(GoIcon.name, GoIcon);
