@@ -21,7 +21,7 @@
     3. provide/inject
     
 #### `LazyLoad`
-[illustration](https://excalidraw.com/#json=5185274262847488,tG6PXFNWzUuIxdvkFzqlhQ)
+[illustration](https://excalidraw.com/#json=5945096507752448,hzn3v29a-PoMgRyPdWtRgw)
 
 lifecycle hooks:
 * bind: 只调用一次，当指令被第一次绑定到元素的时候。这里你可以做一次性启动工作
