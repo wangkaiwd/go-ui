@@ -1,6 +1,7 @@
 <template>
   <div class="tabs">
     <go-tabs v-model="selected">
+      <!-- 如何加icon -->
       <go-tab-pane label="tab1" key="1">
         content1
       </go-tab-pane>
@@ -11,6 +12,11 @@
         content3
       </go-tab-pane>
     </go-tabs>
+    <go-tabs v-model="selected1">
+      <go-tab-pane v-for="n in 40" :key="n" :label="n">
+        {{ n }}
+      </go-tab-pane>
+    </go-tabs>
   </div>
 </template>
 
@@ -19,7 +25,8 @@ export default {
   name: 'Tabs',
   data () {
     return {
-      selected: '1'
+      selected: '1',
+      selected1: 1
     };
   },
 };

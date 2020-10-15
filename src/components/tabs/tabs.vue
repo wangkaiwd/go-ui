@@ -55,13 +55,13 @@ export default {
     },
     calculateLinePosition () {
       this.$nextTick(() => {
-        if (this.activeIndex === undefined) {return; }
+        if (this.activeIndex === -1) {return; }
         // line width equal active tab width
         const { labelWrapper, line, labelItems } = this.$refs;
         const activeLabel = labelItems[this.activeIndex];
         const { left: wrapperLeft } = labelWrapper.getBoundingClientRect();
         const { left: labelLeft, width } = activeLabel.getBoundingClientRect();
-        line.style.left = labelLeft - wrapperLeft + 'px';
+        line.style.left = labelLeft - wrapperLeft + labelWrapper.scrollLeft + 'px';
         line.style.width = width + 'px';
       });
     },
@@ -77,6 +77,11 @@ export default {
     display: flex;
     border-bottom: 1px solid $gray300;
     margin-bottom: 16px;
+    overflow-x: auto;
+    &::-webkit-scrollbar {
+      height: 0;
+      background: transparent; /* Chrome/Safari/Webkit */
+    }
   }
   .tabs-label-item {
     cursor: pointer;

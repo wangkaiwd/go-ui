@@ -12,7 +12,7 @@ export default {
   inject: ['tabs'],
   props: {
     label: {
-      type: String
+      type: [String, Number]
     }
   },
   computed: {
