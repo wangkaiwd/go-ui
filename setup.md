@@ -19,6 +19,10 @@
     1. this.$parent
     2. parent: assign value to each $children instance
     3. provide/inject
+
+#### `Tabs`如何显示`tab label`列表
+* 在`tabs`中遍历`$children`属性，并获取到它的`label`属性
+* 传入一个方法，用于获取子组件的实例，但是这里是通过`slot`来建立父子组件的关系，所以无法通过`props`传参
     
 #### `LazyLoad`
 [illustration](https://excalidraw.com/#json=5185274262847488,tG6PXFNWzUuIxdvkFzqlhQ)

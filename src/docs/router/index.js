@@ -39,6 +39,11 @@ export const routes = [
         name: 'LazyLoad',
         component: () => import('@/demo/lazy-load')
       },
+      {
+        path: '/tabs',
+        name: 'Tabs',
+        component: () => import('@/demo/tabs')
+      },
     ]
   }
 ];
