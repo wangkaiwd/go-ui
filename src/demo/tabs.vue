@@ -2,7 +2,7 @@
   <div class="tabs">
     <go-tabs v-model="selected">
       <!-- 如何加icon -->
-      <go-tab-pane label="tab1" key="1">
+      <go-tab-pane disabled label="tab1" key="1">
         content1
       </go-tab-pane>
       <go-tab-pane label="tab2" key="2">

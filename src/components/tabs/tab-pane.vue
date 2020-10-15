@@ -13,6 +13,10 @@ export default {
   props: {
     label: {
       type: [String, Number]
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {

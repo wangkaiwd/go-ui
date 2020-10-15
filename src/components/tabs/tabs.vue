@@ -3,8 +3,8 @@
     <ul class="tabs-label-wrapper" ref="labelWrapper">
       <li
         class="tabs-label-item"
-        @click="onChange(item.key)" v-for="(item,i) in labels"
-        :class="{active: value === item.key}"
+        @click="onChange(item)" v-for="(item,i) in labels"
+        :class="getLabelCls(item)"
         ref="labelItems"
       >
         {{ item.label }}
@@ -43,12 +43,21 @@ export default {
     this.calculateLinePosition();
   },
   methods: {
+    getLabelCls (item) {
+      return {
+        active: item.key === this.value,
+        disabled: item.disabled
+      };
+    },
     getLabels () {
-      this.labels = this.$children.map(child => {
-        return { label: child.label, key: child.key };
+      this.labels = this.$children.map((child) => {
+        const { label, key, disabled } = child;
+        return { label, key, disabled };
       });
     },
-    onChange (key) {
+    onChange (item) {
+      const { key, disabled } = item;
+      if (disabled) {return; }
       this.$emit('input', key);
       this.$emit('change', key);
       this.calculateLinePosition();
@@ -89,6 +98,10 @@ export default {
     padding: 12px 0;
     &:hover {
       color: $primary;
+    }
+    &.disabled {
+      color: $gray500;
+      cursor: not-allowed;
     }
     &.active {
       font-weight: bold;
