@@ -26,7 +26,7 @@ Vue.component(GoRow.name, GoRow);
 Vue.component(GoCol.name, GoCol);
 Vue.component(GoTabs.name, GoTabs);
 Vue.component(GoTabPane.name, GoTabPane);
-Vue.use(GoLazyLoad, { preload: 1.3, error: require('@/demo/error.png'), loading: require('@/demo/loading.png') });
+Vue.use(GoLazyLoad, { preload: 1.3, error: require('@/demo/lazy-load/error.png'), loading: require('@/demo/lazy-load/loading.png') });
 Vue.config.productionTip = false;
 
 new Vue({

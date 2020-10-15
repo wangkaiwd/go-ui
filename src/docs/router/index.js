@@ -17,32 +17,32 @@ export const routes = [
       {
         path: '/button',
         name: 'Button',
-        component: () => import('@/demo/button')
+        component: () => import('@/demo/button/button')
       },
       {
         path: '/icon',
         name: 'Icon',
-        component: () => import('@/demo/icon')
+        component: () => import('@/demo/icon/icon')
       },
       {
         path: '/layout',
         name: 'Layout',
-        component: () => import('@/demo/layout')
+        component: () => import('@/demo/layout/layout')
       },
       {
         path: '/grid',
         name: 'Grid',
-        component: () => import('@/demo/grid')
+        component: () => import('@/demo/grid/grid')
       },
       {
         path: '/lazy-load',
         name: 'LazyLoad',
-        component: () => import('@/demo/lazy-load')
+        component: () => import('@/demo/lazy-load/lazy-load')
       },
       {
         path: '/tabs',
         name: 'Tabs',
-        component: () => import('@/demo/tabs')
+        component: () => import('@/demo/tabs/tabs')
       },
     ]
   }
