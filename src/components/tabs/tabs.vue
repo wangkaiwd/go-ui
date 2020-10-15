@@ -1,12 +1,15 @@
 <template>
   <div class="tabs">
-    <ul class="tabs-label-wrapper">
+    <ul class="tabs-label-wrapper" ref="labelWrapper">
       <li
         class="tabs-label-item"
-        @click="onChange(label)" v-for="label in labels"
+        @click="onChange(item.key)" v-for="(item,i) in labels"
+        :class="{active: value === item.key}"
+        ref="labelItems"
       >
-        {{ label }}
+        {{ item.label }}
       </li>
+      <div class="line" ref="line"></div>
     </ul>
     <slot></slot>
   </div>
@@ -27,31 +30,75 @@ export default {
   },
   data () {
     return {
-      labels: []
+      labels: [],
     };
+  },
+  computed: {
+    activeIndex () {
+      return this.labels.findIndex(label => label.key === this.value);
+    }
   },
   mounted () {
     this.getLabels();
+    this.calculateLinePosition();
   },
   methods: {
     getLabels () {
       this.labels = this.$children.map(child => {
-        console.log('child', child);
-        return child.label;
+        return { label: child.label, key: child.key };
       });
     },
     onChange (key) {
       this.$emit('input', key);
       this.$emit('change', key);
-    }
+      this.calculateLinePosition();
+    },
+    calculateLinePosition () {
+      this.$nextTick(() => {
+        if (this.activeIndex === undefined) {return; }
+        // line width equal active tab width
+        const { labelWrapper, line, labelItems } = this.$refs;
+        const activeLabel = labelItems[this.activeIndex];
+        const { left: wrapperLeft } = labelWrapper.getBoundingClientRect();
+        const { left: labelLeft, width } = activeLabel.getBoundingClientRect();
+        line.style.left = labelLeft - wrapperLeft + 'px';
+        line.style.width = width + 'px';
+      });
+    },
   }
 };
 </script>
 
 <style lang="scss" scoped>
+@import '~@/assets/styles/vars.scss';
 .tabs {
   .tabs-label-wrapper {
+    position: relative;
     display: flex;
+    border-bottom: 1px solid $gray300;
+    margin-bottom: 16px;
+  }
+  .tabs-label-item {
+    cursor: pointer;
+    margin-right: 32px;
+    padding: 12px 0;
+    &:hover {
+      color: $primary;
+    }
+    &.active {
+      font-weight: bold;
+      color: $primary;
+    }
+  }
+  .line {
+    position: absolute;
+    transition: all 0.3s;
+    transition-property: left, width;
+    left: 0;
+    bottom: 0;
+    width: 40px;
+    height: 2px;
+    background-color: $primary;
   }
 }
 </style>
