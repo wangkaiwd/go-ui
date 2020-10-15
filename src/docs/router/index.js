@@ -44,6 +44,11 @@ export const routes = [
         name: 'Tabs',
         component: () => import('@/demo/tabs/tabs')
       },
+      {
+        path: '/message',
+        name: 'Message',
+        component: () => import('@/demo/message/message')
+      },
     ]
   }
 ];

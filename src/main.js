@@ -14,6 +14,7 @@ import GoRow from '@/components/grid/row';
 import GoLazyLoad from '@/components/lazy-load';
 import GoTabs from '@/components/tabs/tabs';
 import GoTabPane from '@/components/tabs/tab-pane';
+import GoMessage from '@/components/message/index';
 
 Vue.component(GoButton.name, GoButton);
 Vue.component(GoIcon.name, GoIcon);
@@ -26,7 +27,12 @@ Vue.component(GoRow.name, GoRow);
 Vue.component(GoCol.name, GoCol);
 Vue.component(GoTabs.name, GoTabs);
 Vue.component(GoTabPane.name, GoTabPane);
-Vue.use(GoLazyLoad, { preload: 1.3, error: require('@/demo/lazy-load/error.png'), loading: require('@/demo/lazy-load/loading.png') });
+Vue.use(GoLazyLoad, {
+  preload: 1.3,
+  error: require('@/demo/lazy-load/error.png'),
+  loading: require('@/demo/lazy-load/loading.png')
+});
+Vue.use(GoMessage);
 Vue.config.productionTip = false;
 
 new Vue({
