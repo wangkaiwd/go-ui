@@ -13,7 +13,7 @@ export default {
   },
   methods: {
     show () {
-      this.$message.success({ message: 'this is a info message', duration: 4000, showClose: true });
+      this.$message({ type: 'error', message: 'this is a info message', duration: 4000, showClose: true });
     },
     show1 () {
       this.$message.success('this is a success message!');
