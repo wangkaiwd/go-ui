@@ -20,11 +20,19 @@
     2. parent: assign value to each $children instance
     3. provide/inject
 
-#### `Tabs`如何显示`tab label`列表
+#### `Tabs`
+如何显示`tab label`列表 ？  
 * 在`tabs`中遍历`$children`属性，并获取到它的`label`属性
 * 传入一个方法，用于获取子组件的实例，但是这里是通过`slot`来建立父子组件的关系，所以无法通过`props`传参
 * `offsetHeight`: height + padding + border + height of scrollbar
 * `clientHeight`: height + padding
+
+#### `Message`
+* 如何实现组件动画？
+  * 内部设置一个`visible`变量，默认为`false`,控制根元素的显示和隐藏，方便动画
+  * 在`mounted/created`钩子中可以将`visible`设置为`true`, 此时会触发`transition`组件的进入动画，并添加进入的CSS类名
+  * 在组件销毁之前，将`visible`设置为`false`，此时会触发`transition`组件的离开动画，并添加CSS离开类名，以及触发`@after-leave`钩子
+  * `@after-leave`钩子会保证离开动画完成后执行，在此钩子函数中执行组件销毁操作
     
 #### `LazyLoad`
 [illustration](https://excalidraw.com/#json=5945096507752448,hzn3v29a-PoMgRyPdWtRgw)
