@@ -1,6 +1,7 @@
 <template>
   <div class="message">
     <go-button @click="show">show message</go-button>
+    <go-button @click="show1">show message1</go-button>
   </div>
 </template>
 
@@ -12,7 +13,10 @@ export default {
   },
   methods: {
     show () {
-      this.$message.success({ message: 'hello', duration: 4000 });
+      this.$message.success({ message: 'this is a info message', duration: 4000, showClose: true });
+    },
+    show1 () {
+      this.$message.success('this is a success message!');
     }
   }
 };

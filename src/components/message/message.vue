@@ -5,7 +5,7 @@
       <div class="message-content">
         {{ message }}
       </div>
-      <go-icon class="message-close" name="close" v-if="showClose"></go-icon>
+      <go-icon class="message-close" name="close" @click="visible=false" v-if="showClose"></go-icon>
     </div>
   </transition>
 </template>
@@ -18,6 +18,7 @@ export default {
   props: {
     type: {
       type: String,
+      default: 'info',
       validator (val) {
         return ['success', 'error', 'info', 'warning'].includes(val);
       }
@@ -41,7 +42,10 @@ export default {
   },
   mounted () {
     this.visible = true;
-    this.autoClose();
+    // 0 or show close button, message will not automatically close
+    if (!this.showClose || this.duration === 0) {
+      this.autoClose();
+    }
   },
   methods: {
     autoClose () {
@@ -106,6 +110,7 @@ export default {
     top: 50%;
     transform: translateY(-50%);
     color: $gray600;
+    cursor: pointer;
   }
 }
 .slide-enter-active, .slide-leave-active {
