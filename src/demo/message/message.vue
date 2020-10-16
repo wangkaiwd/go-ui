@@ -12,7 +12,7 @@ export default {
   },
   methods: {
     show () {
-      this.$message();
+      this.$message.success({ message: 'hello', duration: 4000 });
     }
   }
 };
