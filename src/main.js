@@ -15,6 +15,7 @@ import GoLazyLoad from '@/components/lazy-load';
 import GoTabs from '@/components/tabs/tabs';
 import GoTabPane from '@/components/tabs/tab-pane';
 import GoMessage from '@/components/message/index';
+import GoUpload from '@/components/upload/upload';
 
 Vue.component(GoButton.name, GoButton);
 Vue.component(GoIcon.name, GoIcon);
@@ -27,6 +28,7 @@ Vue.component(GoRow.name, GoRow);
 Vue.component(GoCol.name, GoCol);
 Vue.component(GoTabs.name, GoTabs);
 Vue.component(GoTabPane.name, GoTabPane);
+Vue.component(GoUpload.name, GoUpload);
 Vue.use(GoLazyLoad, {
   preload: 1.3,
   error: require('@/demo/lazy-load/error.png'),

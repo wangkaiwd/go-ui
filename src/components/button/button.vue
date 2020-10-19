@@ -83,7 +83,8 @@ export default {
   line-height: 1.5715;
   border-radius: 2px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: all 0.2s ease;
+  transition-property: transform, box-shadow;
   box-shadow: 0 4px 6px rgba(50, 50, 93, .11), 0 1px 3px rgba(0, 0, 0, .08);
   &-icon-left, &-icon-loading {
     margin-right: 8px;
@@ -145,6 +146,9 @@ export default {
   &:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 6px rgba(50, 50, 93, .11), 0 1px 3px rgba(0, 0, 0, .08);
+  }
+  &:active:not(.disabled) {
+    box-shadow: none;
   }
 }
 @keyframes spin {
