@@ -1,6 +1,6 @@
 <template>
   <div class="upload">
-    <go-upload action="http://localhost:3000/upload">
+    <go-upload :on-change="onChange" multiple :file-list="fileList" action="http://localhost:3000/upload">
       <go-button color="primary">click to upload</go-button>
     </go-upload>
   </div>
@@ -10,8 +10,15 @@
 export default {
   name: 'upload',
   data () {
-    return {};
+    return {
+      fileList: [],
+    };
   },
+  methods: {
+    onChange (file, fileList) {
+      console.log('file', file, fileList);
+    }
+  }
 };
 </script>
 

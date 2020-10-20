@@ -17,13 +17,14 @@ const request = ({
   file,
   data,
   onSuccess,
-  onError
+  onError,
+  onProgress
 }) => {
   const xhr = new XMLHttpRequest();
   const formData = new FormData();
-  console.log('name', name, file);
   formData.append(name, file);
   entries(data, (key, val) => formData.append(key, val));
+  xhr.upload.onprogress = onProgress;
   xhr.open('POST', url);
   xhr.send(formData);
   xhr.addEventListener('load', () => {
@@ -34,6 +35,7 @@ const request = ({
       onError && onError('error');
     }
   });
+
   xhr.addEventListener('error', (e) => {
     console.log('e', e);
     onError && onError(e);

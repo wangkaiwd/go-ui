@@ -1,6 +1,8 @@
 <template>
   <div class="go-upload">
     <input
+      :multiple="multiple"
+      :accept="accept"
       class="go-upload-input"
       ref="input"
       type="file"
@@ -13,12 +15,18 @@
       <slot></slot>
     </div>
     <div class="go-upload-list">
-      <div class="go-upload-list-item" v-for="file in fileList">
-        <img class="go-upload-list-item-img" :src="file.url" alt="">
+      <div class="go-upload-list-item" v-for="file in files" :key="file.uid">
+        <div class="go-upload-list-item-img">
+          <go-icon v-if="file.status === 'pending'" class="go-upload-item-img-loading" name="loading"></go-icon>
+          <img v-else class="go-upload-list-item-img" :src="file.url" alt="">
+        </div>
         <div class="go-upload-list-item-name">
           <span>{{ file.name }}</span>
+          <my-progress v-if="file.status === 'pending'" :percent="file.percent"></my-progress>
         </div>
-        <span><go-icon name="delete"></go-icon></span>
+        <span class="go-upload-list-item-delete">
+          <go-icon name="delete"></go-icon>
+        </span>
       </div>
     </div>
   </div>
@@ -26,13 +34,19 @@
 
 <script>
 import request from '@/components/upload/request';
+import MyProgress from '@/components/upload/progress';
 
 export default {
   name: 'GoUpload',
+  components: { MyProgress },
   props: {
     name: {
       type: String,
       default: 'file'
+    },
+    fileList: {
+      type: Array,
+      default: () => []
     },
     action: {
       type: String,
@@ -48,53 +62,85 @@ export default {
       type: Object,
       default: () => ({})
     },
+    accept: {
+      type: String
+    },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
     customHttpRequest: {
       type: Function,
       default: request
     }
   },
+  watch: {
+    // 用watch监听的问题，可以设置默认值，如何传入的fileList发生更改，会彻底覆盖组件中的files数据。
+    // 可以在onChange事件中对fileList进行赋值操作
+    fileList: {
+      handler (val) {
+        this.files = val.map(file => {
+          file.uid = file.uid || Date.now() + this.tempIndex++;
+          file.status = file.status || 'success';
+          return file;
+        });
+      },
+      immediate: true
+    }
+  },
   data () {
     return {
-      fileList: []
+      files: [],
+      // 解决多图同时上传问题
+      tempIndex: 0
     };
   },
   methods: {
     onInputChange (e) {
       // e.target.files is pseudo array, need to convert to real array
-      const files = Array.from(e.target.files);
-      this.normalizeFiles(files);
-      if (this.beforeUpload && this.beforeUpload()) {
-        this.doUpload();
+      const rawFiles = Array.from(e.target.files);
+      const files = this.normalizeFiles(rawFiles);
+      if (!this.beforeUpload || this.beforeUpload(files, this.files)) {
+        this.doUpload(files);
       }
     },
     start () {
 
     },
-    doUpload () {
-      this.fileList.forEach(file => {
+    doUpload (files) {
+      files.forEach(file => {
         const options = {
           url: this.action,
           name: this.name,
           file: file.raw,
           data: this.data,
           onSuccess: this.onSuccess.bind(this, file),
-          onError: this.onError.bind(this, file)
+          onError: this.onError.bind(this, file),
+          onProgress: this.onProgress.bind(this, file)
         };
+        file.status = 'pending';
+        if (this.onChange) {
+          this.onChange(file, this.files);
+        }
         const result = this.customHttpRequest(options);
         if (result instanceof Promise) {
           result.then(this.onSuccess, this.onError);
         }
       });
     },
-    normalizeFiles (files) {
-      this.fileList = files.map((file) => {
+    normalizeFiles (rawFiles) {
+      const files = rawFiles.map((file) => {
         return {
           name: file.name,
-          uid: Date.now(),
+          uid: Date.now() + this.tempIndex++,
           status: 'init', // value list: init pending success failure
           raw: file
         };
       });
+      // concat does not change the existing arrays, but instead returns a new array
+      // concat 不会修改已经存在的数组而是会返回一个新数组
+      this.files = this.files.concat(files);
+      return files;
     },
     onError (file, error) {
       console.log('error', error);
@@ -102,10 +148,18 @@ export default {
     },
     onSuccess (file, response) {
       file.status = 'success';
+      this.$set(file, 'response', response);
       this.$set(file, 'url', response.data.path);
+      if (this.onChange) {
+        this.onChange(file, this.files);
+      }
     },
-    onProgress () {
-
+    onProgress (file, event) {
+      const percent = event.loaded / event.total * 100;
+      this.$set(file, 'percent', percent);
+      if (this.onChange) {
+        this.onChange(file, this.files);
+      }
     },
     onClickTrigger () {
       this.$refs.input.click();
@@ -115,13 +169,44 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "~@/assets/styles/mixins.scss";
 .go-upload {
   .go-upload-input {
     display: none;
+    align-items: center;
+  }
+  .go-upload-list {
+  }
+  .go-upload-list-item {
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #d9d9d9;
+  }
+  .go-upload-list-item-name {
+    margin-left: 8px;
+    flex: 1;
+    @include ellipsis;
+  }
+  .go-upload-list-item-delete {
+    cursor: pointer;
   }
   .go-upload-list-item-img {
-    width: 86px;
-    height: 86px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    & > img {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .go-upload-item-img-loading {
+    font-size: 20px;
+    @include spinner;
   }
 }
 </style>
