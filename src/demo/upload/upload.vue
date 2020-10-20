@@ -1,6 +1,6 @@
 <template>
   <div class="upload">
-    <go-upload>
+    <go-upload action="http://localhost:3000/upload">
       <go-button color="primary">click to upload</go-button>
     </go-upload>
   </div>
