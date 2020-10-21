@@ -72,7 +72,7 @@ app.listen(PORT, () => {
 在编码之前，我们先看下组件的基础用法：
 ```vue
 <template>
-  <go-upload name="file" :action="action">
+  <go-upload name="file" :limit="3" multiple on-exceed="onExceed" :action="action">
     <go-button color="primary">click to upload</go-button>
   </go-upload>
 </template>
@@ -83,6 +83,11 @@ export default {
     return {
       action: 'https://afternoon-dawn-09444.herokuapp.com/upload'
     };
+  },
+  methods: {
+    onExceed() {
+    
+    }
   }
 };
 </script>
@@ -227,6 +232,118 @@ export default request;
 最终`request`函数会返回`xhr`，方便之后调用`xhr`的属性和方法，如：通过`xhr.abort()`来取消请求。
 
 > 注意：**`xhr.upload`的`progress`事件必须在调用`xhr.open`之前进行监听，否则不会生效**，想要了解的小伙伴可以看这里: [xhr.upload.onprogress doesn't work](https://stackoverflow.com/a/14161642/12819402)
+
+### 开始上传
+用户选择的文件在`input`的`change`事件的事件对象中：`e.target.files`，然后通过`uploadFiles`进行上传文件
+```vue
+<script>
+export default {
+  methods: {
+    onInputChange (e) {
+      // e.target.files is pseudo array, need to convert to real array
+      const rawFiles = Array.from(e.target.files);
+      this.uploadFiles(rawFiles);
+    },
+    uploadFiles (rawFiles) {
+      const filesLen = rawFiles.length + this.files.length;
+      if (this.limit && this.limit > filesLen) {
+        return this.onExceed(rawFiles, this.files);
+      }
+      this.startUpload(rawFiles);
+    }
+  }
+}
+</script>
+```
+上传之前会通过`limit`来判断上传的数量是否超过了限制，如果超过的话回调用用户传入的`onExceed`方法，并停止上传。
+
+在`startUpload`方法中，我们会遍历用户选择的每个文件，然后依次进行上传。在真正上传之前，会执行`normalizeFiles`将原生的`file`对象进行格式化，处理成组件中方便使用的格式：
+```vue
+<script>
+export default {
+  methods: {
+    startUpload (rawFiles) {
+      rawFiles.forEach(rawFile => {
+        const file = this.normalizeFiles(rawFile);
+        if (!this.beforeUpload || this.beforeUpload()) {
+          this.upload(file);
+        }
+      });
+    },
+    normalizeFiles (rawFile) {
+      const file = {
+        name: rawFile.name, // 文件名
+        size: rawFile.size, // 文件尺寸
+        type: rawFile.type, // 文件类型
+        percent: 0, // 上传进度
+        uid: Date.now() + this.tempIndex++, // 唯一表示
+        status: 'init', // value list: init pending success failure
+        raw: rawFile // 原生文件对象
+      };
+      // concat does not change the existing arrays, but instead returns a new array
+      this.files.push(file);
+      return file;
+    },
+  }
+}
+</script>
+```
+在格式化`file`对象的时候，需要我们生成唯一的`uid`来标识每一个上传的文件信息。这里我们使用了`Date.now()`来生成随机数，但是在进行多文件上传的时候，会同时上传多个文件，导致`uid`重复，所以我们为其加上`tempIndex`，防止重复。
+
+在拿到格式化后的文件后，将会进入真正的上传环节： 
+```vue
+<script>
+export default {
+  methods: {
+    upload (file) {
+      const options = {
+        url: this.action,
+        name: this.name,
+        file: file.raw,
+        data: this.data,
+        onSuccess: this.handleSuccess.bind(this, file),
+        onError: this.handleError.bind(this, file),
+        onProgress: this.handleProgress.bind(this, file)
+      };
+      file.status = 'pending';
+      this.onChange(file, this.files);
+      const req = this.customHttpRequest(options);
+      if (req instanceof Promise) {
+        req.then(options.onSuccess, options.handleError);
+      }
+    },
+    handleSuccess (file, response) {
+      file.status = 'success';
+      this.$set(file, 'response', response);
+      // Not only front end can implement picture preview but also back end can do it. Here make use of back end api
+      this.$set(file, 'url', response.data.path);
+      this.onChange(file, this.files);
+      this.onSuccess(response, file, this.files);
+    },
+    handleError (file, error) {
+      file.status = 'failure';
+      this.onError(error, file, this.files);
+    },
+    handleProgress (file, event) {
+      file.percent = event.percent;
+      this.onChange(file, this.files);
+      this.onProgress(event, file, this.files);
+    },
+  }
+}
+</script>
+```
+`upload`为真正发起请求的函数，其内部首先收集了请求发起所需要的所有参数，之后将文件状态改为`pending`后进行上传操作。其中对应的回调函数所实现的功能如下：
+* `handleSuccess`: 修改文件状态为`success`；添加`response`属性为请求响应；添加`url`属性为文件预览地址
+* `handleProgress`: 设置文件的上传进度百分比
+* `handleError`: 修改文件状态为`failure`
+
+现在我们可以成功的处理上传过程中文件的不同状态，接下来我们在页面中进行展示。
+
+### 上传列表
+
+
+### 拖拽上传
 
 ### 结语
 组件完成后，可以部署到`GitHub Pages`在网络中进行分享，具体的部署过程：[部署Vue项目到GitHub Pages](https://github.com/wangkaiwd/vue-component-communication/blob/master/deploy.md)
