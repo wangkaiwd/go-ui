@@ -6,10 +6,11 @@
     @dragleave="onDragleave"
     @dragover="onDragover"
     @drop="onDrop"
+    @click="onClick"
   >
     <go-icon class="go-upload-dragger-icon" name="upload"></go-icon>
     <div class="go-upload-dragger-describe">
-      <span>Drop file here</span>
+      <span>Drop file here or click to upload</span>
     </div>
   </div>
 </template>
@@ -43,6 +44,9 @@ export default {
       e.preventDefault();
       const files = e.dataTransfer.files;
       this.$emit('handle-files', files);
+    },
+    onClick () {
+      this.$emit('on-click');
     }
   }
 };

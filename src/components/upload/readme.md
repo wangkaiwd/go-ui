@@ -1,25 +1,17 @@
-## 上传组件
-* [doc link](https://developer.mozilla.org/zh-CN/docs/Web/API/File/Using_files_from_web_applications)
-  ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201019111435.png)
-* [xhr.upload.onprogress doesn't work](https://stackoverflow.com/a/14161642/12819402)
-* `Array.prototype.concat`不会修改操作的数组，而是会返回一个新数组
-* 格式化上传文件：
-  ```js
-  const normalizedFile = {
-    name: rawFile.name,
-    size: rawFile.size,
-    type: rawFile.type,
-    percent: 0,
-    uid: Date.now() + this.tempIndex++,
-    status: 'init', // value list: init pending success failure
-    raw: rawFile
-  }
-  ```
-* 实现功能：
-  * onProgress
-  * limit/onExceed
-  * customHttpRequest
-  * beforeUpload
-  * onChange
-  * drag
-### Usage
+## `Vue`实战：文件上传组件
+
+文件上传是我们作为开发者在日常工作中经常遇到的一个需求，各个流行的组件库中也都有现成的组件可以很方便的直接调用。具体的用法不再赘述，小伙伴们可以在组件库中查看`demo`，这里笔者主要介绍下如何实现一个`Upload`组件。
+
+组件支持的功能如下：
+* 上传进度条显示
+* 图片预览
+* 自定义上传请求方法
+* 图片数量限制
+* 支持拖拽上传
+* 使用`koa`以及对应的中间件实现图片上传服务器
+
+### 搭建文件上传服务器
+
+### 触发`Input`的`change`事件
+
+### 

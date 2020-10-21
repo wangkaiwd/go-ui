@@ -8,7 +8,7 @@
       type="file"
       @change="onInputChange"
     >
-    <upload-dragger v-if="drag" @handle-files="uploadFiles"></upload-dragger>
+    <upload-dragger v-if="drag" @on-click="onClickTrigger" @handle-files="uploadFiles"></upload-dragger>
     <div
       v-else
       class="go-upload-trigger"
