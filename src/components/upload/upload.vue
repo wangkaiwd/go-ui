@@ -15,12 +15,12 @@
       <slot></slot>
     </div>
     <div class="go-upload-list">
-      <div :class="['go-upload-list-item',file.status]" v-for="file in files" :key="file.uid">
+      <div :class="['go-upload-list-item',file.status]" v-for="(file,i) in files" :key="file.uid">
         <!--  FIXME:code in here is so chaos, can it become more elegance?  -->
         <div class="go-upload-list-item-img">
           <go-icon v-if="file.status === 'pending'" class="go-upload-item-img-loading" name="loading"></go-icon>
           <template v-else-if="file.status === 'success'">
-            <img v-if="isImage(file.raw)" class="go-upload-list-item-img" :src="file.url" alt="">
+            <img v-if="isImage(file.type)" class="go-upload-list-item-img" :src="file.url" alt="">
             <go-icon v-else class="go-upload-item-file" name="file"></go-icon>
           </template>
           <go-icon v-else class="go-upload-item-img-error" name="picture"></go-icon>
@@ -29,7 +29,7 @@
           <span>{{ file.name }}</span>
           <my-progress v-if="file.status === 'pending'" :percent="file.percent"></my-progress>
         </div>
-        <span class="go-upload-list-item-delete">
+        <span v-if="file.status !== 'pending'" class="go-upload-list-item-delete" @click="onDelete(i)">
           <go-icon name="delete"></go-icon>
         </span>
       </div>
@@ -134,12 +134,15 @@ export default {
       });
     },
     normalizeFiles (rawFiles) {
-      const files = rawFiles.map((file) => {
+      const files = rawFiles.map((rawFile) => {
         return {
-          name: file.name,
+          name: rawFile.name,
+          size: rawFile.size,
+          type: rawFile.type,
+          percent: 0,
           uid: Date.now() + this.tempIndex++,
           status: 'init', // value list: init pending success failure
-          raw: file
+          raw: rawFile
         };
       });
       // concat does not change the existing arrays, but instead returns a new array
@@ -160,8 +163,7 @@ export default {
       }
     },
     onProgress (file, event) {
-      const percent = event.loaded / event.total * 100;
-      this.$set(file, 'percent', percent);
+      file.percent = event.loaded / event.total * 100;
       if (this.onChange) {
         this.onChange(file, this.files);
       }
@@ -169,9 +171,12 @@ export default {
     onClickTrigger () {
       this.$refs.input.click();
     },
-    isImage (rawFile) {
-      if (!rawFile) {return;}
-      return rawFile.type.includes('image');
+    isImage (type) {
+      if (!type) {return;}
+      return type.includes('image');
+    },
+    onDelete (i) {
+      this.files.splice(i, 1);
     }
   }
 };
