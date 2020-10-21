@@ -42,6 +42,7 @@ export default {
     onSuccess: { type: Function, default: noop },
     onError: { type: Function, default: noop },
     onProgress: { type: Function, default: noop },
+    onExceed: { type: Function, default: noop },
     data: {
       type: Object,
       default: () => ({})
@@ -87,47 +88,52 @@ export default {
     onInputChange (e) {
       // e.target.files is pseudo array, need to convert to real array
       const rawFiles = Array.from(e.target.files);
-      const files = this.normalizeFiles(rawFiles);
-      if (!this.beforeUpload || this.beforeUpload(files)) {
-        this.doUpload(files);
+      const filesLen = rawFiles.length + this.files.length;
+      if (this.limit && this.limit > filesLen) {
+        return this.onExceed(rawFiles, this.files);
       }
+      this.startUpload(rawFiles);
     },
-    doUpload (files) {
-      files.forEach(file => {
-        const { uid } = file;
-        const options = {
-          url: this.action,
-          name: this.name,
-          file: file.raw,
-          data: this.data,
-          onSuccess: this.handleSuccess.bind(this, file),
-          onError: this.handleError.bind(this, file),
-          onProgress: this.handleProgress.bind(this, file)
-        };
-        file.status = 'pending';
-        this.onChange(file, this.files);
-        const req = this.customHttpRequest(options);
-        this.reqs[uid] = req;
-        if (req instanceof Promise) {
-          req.then(options.onSuccess, options.handleError);
+    startUpload (rawFiles) {
+      rawFiles.forEach(rawFile => {
+        const file = this.normalizeFiles(rawFile);
+        if (!this.beforeUpload || this.beforeUpload()) {
+          this.upload(file);
         }
       });
     },
-    normalizeFiles (rawFiles) {
-      const files = rawFiles.map((rawFile) => {
-        return {
-          name: rawFile.name,
-          size: rawFile.size,
-          type: rawFile.type,
-          percent: 0,
-          uid: Date.now() + this.tempIndex++,
-          status: 'init', // value list: init pending success failure
-          raw: rawFile
-        };
-      });
+    upload (file) {
+      const { uid } = file;
+      const options = {
+        url: this.action,
+        name: this.name,
+        file: file.raw,
+        data: this.data,
+        onSuccess: this.handleSuccess.bind(this, file),
+        onError: this.handleError.bind(this, file),
+        onProgress: this.handleProgress.bind(this, file)
+      };
+      file.status = 'pending';
+      this.onChange(file, this.files);
+      const req = this.customHttpRequest(options);
+      this.reqs[uid] = req;
+      if (req instanceof Promise) {
+        req.then(options.onSuccess, options.handleError);
+      }
+    },
+    normalizeFiles (rawFile) {
+      const file = {
+        name: rawFile.name,
+        size: rawFile.size,
+        type: rawFile.type,
+        percent: 0,
+        uid: Date.now() + this.tempIndex++,
+        status: 'init', // value list: init pending success failure
+        raw: rawFile
+      };
       // concat does not change the existing arrays, but instead returns a new array
-      this.files = this.files.concat(files);
-      return files;
+      this.files.concat(file);
+      return file;
     },
     handleError (file, error) {
       const { uid } = file;
@@ -162,6 +168,7 @@ export default {
       const { uid } = file;
       if (this.reqs[uid]) {
         this.reqs[uid].abort();
+        delete this.reqs[uid];
       }
     }
   }

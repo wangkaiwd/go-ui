@@ -3,13 +3,17 @@
 ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201019111435.png)
 * [xhr.upload.onprogress doesn't work](https://stackoverflow.com/a/14161642/12819402)
 * `Array.prototype.concat`不会修改操作的数组，而是会返回一个新数组
+* 格式化上传文件：
+  ```js
+  const normalizedFile = {
+    name: rawFile.name,
+    size: rawFile.size,
+    type: rawFile.type,
+    percent: 0,
+    uid: Date.now() + this.tempIndex++,
+    status: 'init', // value list: init pending success failure
+    raw: rawFile
+  }
+  ```
+* 
 ### Usage
-基础用法： 
-```vue
-
-```
-
-拖拽上传：
-```vue
-
-```
