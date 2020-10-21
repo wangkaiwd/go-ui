@@ -8,7 +8,9 @@
       type="file"
       @change="onInputChange"
     >
+    <upload-dragger v-if="drag" @handle-files="uploadFiles"></upload-dragger>
     <div
+      v-else
       class="go-upload-trigger"
       @click="onClickTrigger"
     >
@@ -23,10 +25,11 @@ import request from '@/components/upload/request';
 import MyProgress from '@/components/upload/progress';
 import UploadList from '@/components/upload/upload-list';
 import { noop } from '@/shared/util';
+import UploadDragger from '@/components/upload/upload-dragger';
 
 export default {
   name: 'GoUpload',
-  components: { UploadList, MyProgress },
+  components: { UploadDragger, UploadList, MyProgress },
   props: {
     name: { type: String, default: 'file' },
     fileList: {
@@ -47,7 +50,12 @@ export default {
     accept: { type: String },
     multiple: { type: Boolean, default: false },
     customHttpRequest: { type: Function, default: request },
-    limit: { type: Number }
+    limit: { type: Number },
+    // active drag and drop mode
+    drag: {
+      type: Boolean,
+      default: false
+    }
   },
   watch: {
     // 用watch监听的问题，可以设置默认值，如何传入的fileList发生更改，会彻底覆盖组件中的files数据。
@@ -77,6 +85,9 @@ export default {
     onInputChange (e) {
       // e.target.files is pseudo array, need to convert to real array
       const rawFiles = Array.from(e.target.files);
+      this.uploadFiles(rawFiles);
+    },
+    uploadFiles (rawFiles) {
       const filesLen = rawFiles.length + this.files.length;
       if (this.limit && this.limit > filesLen) {
         return this.onExceed(rawFiles, this.files);
@@ -121,7 +132,7 @@ export default {
         raw: rawFile
       };
       // concat does not change the existing arrays, but instead returns a new array
-      this.files.concat(file);
+      this.files.push(file);
       return file;
     },
     handleError (file, error) {
@@ -168,7 +179,7 @@ export default {
 .go-upload {
   .go-upload-input {
     display: none;
-    align-items: center;
+    width: 100%;
   }
 }
 </style>

@@ -3,6 +3,10 @@
     <go-upload :on-change="onChange" multiple :file-list="fileList" action="http://localhost:3000/upload">
       <go-button color="primary">click to upload</go-button>
     </go-upload>
+    <hr>
+
+    <go-upload multiple drag action="http://localhost:3000/upload">
+    </go-upload>
   </div>
 </template>
 
