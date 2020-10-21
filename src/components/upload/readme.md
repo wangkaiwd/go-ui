@@ -19,6 +19,7 @@
 > * [在线`demo`](https://wangkaiwd.github.io/go-ui/#/upload)
 > * [组件源代码](https://github.com/wangkaiwd/go-ui/blob/master/src/components/upload/upload.vue)
 > * [服务端上传接口源代码](https://github.com/wangkaiwd/upload-server)
+
 ### 搭建文件上传服务器
 在书写前端`Upload`组件之前，首先需要通过`Node.js`来搭建一个服务器。使用到的一些库如下：
 * `Koa`: `Node.js`服务端框架
@@ -226,3 +227,8 @@ export default request;
 最终`request`函数会返回`xhr`，方便之后调用`xhr`的属性和方法，如：通过`xhr.abort()`来取消请求。
 
 > 注意：**`xhr.upload`的`progress`事件必须在调用`xhr.open`之前进行监听，否则不会生效**，想要了解的小伙伴可以看这里: [xhr.upload.onprogress doesn't work](https://stackoverflow.com/a/14161642/12819402)
+
+### 结语
+组件完成后，可以部署到`GitHub Pages`在网络中进行分享，具体的部署过程：[部署Vue项目到GitHub Pages](https://github.com/wangkaiwd/vue-component-communication/blob/master/deploy.md)
+
+希望在看完这篇文章后能帮助阅读的小伙伴明白上传组件的具体实现逻辑，并且可以更好的使用社区流行框架中的`Upload`组件，并对其进行二次封装。
