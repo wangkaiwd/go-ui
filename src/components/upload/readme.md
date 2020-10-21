@@ -11,8 +11,9 @@
 * 使用`koa`以及对应的中间件实现图片上传服务器接口
 
 最终效果图如下：
-<img width="100%" src="https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/Oct-21-2020%2022-35-06.gif"/>
-![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/Oct-21-2020%2022-35-06.gif)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/Oct-21-2020%2022-35-06.gif"/>
+</p>
 
 > 相关资料：
 > * [在线`demo`](https://wangkaiwd.github.io/go-ui/#/upload)
