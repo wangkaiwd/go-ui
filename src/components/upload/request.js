@@ -11,6 +11,17 @@ const processResponse = (response) => {
   }
   return response;
 };
+/**
+ * 文件上传
+ * @param url 上传地址
+ * @param name 上传文件的`key`值，需要和后端约定
+ * @param file 上传的File对象
+ * @param data 除文件外的其它参数，类型为object
+ * @param onSuccess 上传成功后的回调
+ * @param onError 上传失败后的回调
+ * @param onProgress 上传进度回调
+ * @returns {XMLHttpRequest}
+ */
 const request = ({
   url,
   name,

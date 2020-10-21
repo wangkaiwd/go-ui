@@ -68,5 +68,161 @@ app.listen(PORT, () => {
 最终我们是将服务器部署到了`heroku`上，具体的部署过程参考这里：[传送门](https://github.com/wangkaiwd/upload-server/blob/master/readme.md#%E4%BD%BF%E7%94%A8heroku%E9%83%A8%E7%BD%B2%E6%9C%8D%E5%8A%A1)
 
 ### 组件设计
+在编码之前，我们先看下组件的基础用法：
+```vue
+<template>
+  <go-upload name="file" :action="action">
+    <go-button color="primary">click to upload</go-button>
+  </go-upload>
+</template>
 
-### 
+<script>
+export default {
+  data () {
+    return {
+      action: 'https://afternoon-dawn-09444.herokuapp.com/upload'
+    };
+  }
+};
+</script>
+```
+组件通过插槽的形式来放置文件上传的触发按钮，并且接收`name`以及`action`属性。
+
+`name`属性是我们和服务端约定好的文件上传的`key`，而`action`则是组件的上传地址。下面我们开始组件的实现。
+
+### 触发`Input`的`change`事件
+根据组件的使用方式，我们可以写出下面的代码：
+```vue
+<template>
+  <div class="go-upload">
+    <input
+      class="go-upload-input"
+      ref="input"
+      type="file"
+    >
+    <div class="go-upload-trigger" >
+      <slot></slot>
+    </div>
+  </div>
+</template>
+<script>
+export default {
+  props: {
+    name: { type: String, default: 'file' },
+    action: {
+      type: String,
+      required: true
+    },
+  }
+}
+</script>
+```
+只要点击`type=file`对应的`input`，就会弹出对应的上传文件窗口。但是由于原生的`input`比较丑，我们可以将其隐藏(`display:none`)，然后通过手动触发`input`的`click`事件来进而触发`input`的`change`事件。
+
+具体的细节再[`mdn`](https://developer.mozilla.org/zh-CN/docs/Web/API/File/Using_files_from_web_applications) 中有介绍:  
+![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201019111435.png)
+
+在组件中，当用户点击`slot`中的按钮时，`click`事件会冒泡到`go-upload-trigger`对应的`div`，我们可以监听`go-upload-trigger`的`click`事件，然后再调用`input`的`click`进而弹出上传窗口：
+```vue
+<template>
+  <div class="go-upload">
+    <input
+      class="go-upload-input"
+      ref="input"
+      type="file"
+    >
+    <div class="go-upload-trigger" @click="onClickTrigger">
+      <slot></slot>
+    </div>
+  </div>
+</template>
+<script>
+export default {
+  // ...
+  methods: {
+    onClickTrigger () {
+      this.$refs.input.click();
+    }
+  }  
+}
+</script>
+```
+通过这种方式，我们便可以实现一个比较美观的按钮来进行点击上传文件。
+
+在上传之前，我们先整理一下要做的事情：
+* 实现上传方法封装
+* 获取到用户选择的文件(`e.target.files`)
+* 整理`XMLHttpRequest`上传所需参数，并调用上传方法
+* 在上传过程中更新`fileList`的状态，方便进行展示
+
+### 实现`XMLHttpRequest`文件上传方法
+> `XMLHttpRequest`的详细用法可以看这里: [XMLHttpRequest](https://javascript.info/xmlhttprequest)
+
+文件上传可以使用`FormData`来实现，`FormData`可以轻易地构造出一组代表`form`字段和它们值的`key/value`键值对，而不用我们再在页面中书写`form`表单。
+
+为了方便使用，用户传入的`data`是一个对象，我们需要遍历其中的每一项，然后将`key/value`通过`append`方法追加到`formData`中，然后传给服务端，源码如下：
+```javascript
+// XMLHttpRequest常用的三个事件： error/load/progress
+import { entries } from '@/shared/util';
+
+const processResponse = (response) => {
+  if (typeof response === 'string') {
+    try {
+      return JSON.parse(response);
+    } catch (e) {
+      return response;
+    }
+  }
+  return response;
+};
+const request = ({
+  url,
+  name,
+  file,
+  data,
+  onSuccess,
+  onError,
+  onProgress
+}) => {
+  const xhr = new XMLHttpRequest();
+  const formData = new FormData();
+  // 传入文件key,value对
+  formData.append(name, file);
+  // 遍历对象方便为formData添加key,value对
+  entries(data, (key, val) => formData.append(key, val));
+  // 监听上传的progress事件来监听上传过程，显示上传进度
+  xhr.upload.addEventListener('progress', (e) => {
+    e.percent = e.loaded / e.total * 100;
+    onProgress(e);
+  });
+  xhr.open('POST', url);
+  xhr.send(formData);
+  xhr.addEventListener('load', () => {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      const response = processResponse(xhr.response);
+      onSuccess(response);
+    } else {
+      onError(new Error('upload request failed!'));
+    }
+  });
+
+  xhr.addEventListener('error', (e) => {
+    onError(e);
+  });
+  return xhr;
+};
+
+export default request;
+```
+对应的参数含义如下：  
+* url 上传地址
+* name 上传文件的`key`值，需要和后端约定
+* file 上传的File对象
+* data 除文件外的其它参数，类型为object
+* onSuccess 上传成功后的回调
+* onError 上传失败后的回调
+* onProgress 上传进度回调
+
+最终`request`函数会返回`xhr`，方便之后调用`xhr`的属性和方法，如：通过`xhr.abort()`来取消请求。
+
+> 注意：**`xhr.upload`的`progress`事件必须在调用`xhr.open`之前进行监听，否则不会生效**，想要了解的小伙伴可以看这里: [xhr.upload.onprogress doesn't work](https://stackoverflow.com/a/14161642/12819402)
