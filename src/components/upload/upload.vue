@@ -43,21 +43,10 @@ export default {
     onError: { type: Function, default: noop },
     onProgress: { type: Function, default: noop },
     onExceed: { type: Function, default: noop },
-    data: {
-      type: Object,
-      default: () => ({})
-    },
-    accept: {
-      type: String
-    },
-    multiple: {
-      type: Boolean,
-      default: false
-    },
-    customHttpRequest: {
-      type: Function,
-      default: request
-    },
+    data: { type: Object, default: () => ({}) },
+    accept: { type: String },
+    multiple: { type: Boolean, default: false },
+    customHttpRequest: { type: Function, default: request },
     limit: { type: Number }
   },
   watch: {

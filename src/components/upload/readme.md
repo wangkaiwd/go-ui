@@ -15,5 +15,11 @@
     raw: rawFile
   }
   ```
-* 
+* 实现功能：
+  * onProgress
+  * limit/onExceed
+  * customHttpRequest
+  * beforeUpload
+  * onChange
+  * drag
 ### Usage
