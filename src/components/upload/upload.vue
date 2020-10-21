@@ -15,10 +15,15 @@
       <slot></slot>
     </div>
     <div class="go-upload-list">
-      <div class="go-upload-list-item" v-for="file in files" :key="file.uid">
+      <div :class="['go-upload-list-item',file.status]" v-for="file in files" :key="file.uid">
+        <!--  FIXME:code in here is so chaos, can it become more elegance?  -->
         <div class="go-upload-list-item-img">
           <go-icon v-if="file.status === 'pending'" class="go-upload-item-img-loading" name="loading"></go-icon>
-          <img v-else class="go-upload-list-item-img" :src="file.url" alt="">
+          <template v-else-if="file.status === 'success'">
+            <img v-if="isImage(file.raw)" class="go-upload-list-item-img" :src="file.url" alt="">
+            <go-icon v-else class="go-upload-item-file" name="file"></go-icon>
+          </template>
+          <go-icon v-else class="go-upload-item-img-error" name="picture"></go-icon>
         </div>
         <div class="go-upload-list-item-name">
           <span>{{ file.name }}</span>
@@ -163,6 +168,10 @@ export default {
     },
     onClickTrigger () {
       this.$refs.input.click();
+    },
+    isImage (rawFile) {
+      if (!rawFile) {return;}
+      return rawFile.type.includes('image');
     }
   }
 };
@@ -170,6 +179,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/assets/styles/mixins.scss";
+@import "~@/assets/styles/vars.scss";
 .go-upload {
   .go-upload-input {
     display: none;
@@ -184,6 +194,15 @@ export default {
     display: flex;
     align-items: center;
     border: 1px solid #d9d9d9;
+  }
+  .go-upload-list-item.failure {
+    border: 1px solid $danger;
+    color: $danger;
+  }
+  .go-upload-list-item.success {
+    .go-upload-list-item-name {
+      color: $primary;
+    }
   }
   .go-upload-list-item-name {
     margin-left: 8px;
@@ -207,6 +226,10 @@ export default {
   .go-upload-item-img-loading {
     font-size: 20px;
     @include spinner;
+  }
+  .go-upload-item-error,
+  .go-upload-item-file {
+    font-size: 38px;
   }
 }
 </style>
