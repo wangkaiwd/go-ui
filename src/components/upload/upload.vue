@@ -14,41 +14,21 @@
     >
       <slot></slot>
     </div>
-    <div class="go-upload-list">
-      <div :class="['go-upload-list-item',file.status]" v-for="(file,i) in files" :key="file.uid">
-        <!--  FIXME:code in here is so chaos, can it become more elegance?  -->
-        <div class="go-upload-list-item-img">
-          <go-icon v-if="file.status === 'pending'" class="go-upload-item-img-loading" name="loading"></go-icon>
-          <template v-else-if="file.status === 'success'">
-            <img v-if="isImage(file.type)" class="go-upload-list-item-img" :src="file.url" alt="">
-            <go-icon v-else class="go-upload-item-file" name="file"></go-icon>
-          </template>
-          <go-icon v-else class="go-upload-item-img-error" name="picture"></go-icon>
-        </div>
-        <div class="go-upload-list-item-name">
-          <span>{{ file.name }}</span>
-          <my-progress v-if="file.status === 'pending'" :percent="file.percent"></my-progress>
-        </div>
-        <span v-if="file.status !== 'pending'" class="go-upload-list-item-delete" @click="onDelete(i)">
-          <go-icon name="delete"></go-icon>
-        </span>
-      </div>
-    </div>
+    <upload-list @on-delete="onDelete" :files="this.files"></upload-list>
   </div>
 </template>
 
 <script>
 import request from '@/components/upload/request';
 import MyProgress from '@/components/upload/progress';
+import UploadList from '@/components/upload/upload-list';
+import { noop } from '@/shared/util';
 
 export default {
   name: 'GoUpload',
-  components: { MyProgress },
+  components: { UploadList, MyProgress },
   props: {
-    name: {
-      type: String,
-      default: 'file'
-    },
+    name: { type: String, default: 'file' },
     fileList: {
       type: Array,
       default: () => []
@@ -57,12 +37,11 @@ export default {
       type: String,
       required: true
     },
-    beforeUpload: {
-      type: Function
-    },
-    onChange: {
-      type: Function
-    },
+    beforeUpload: { type: Function },
+    onChange: { type: Function, default: noop },
+    onSuccess: { type: Function, default: noop },
+    onError: { type: Function, default: noop },
+    onProgress: { type: Function, default: noop },
     data: {
       type: Object,
       default: () => ({})
@@ -77,7 +56,8 @@ export default {
     customHttpRequest: {
       type: Function,
       default: request
-    }
+    },
+    limit: { type: Number }
   },
   watch: {
     // 用watch监听的问题，可以设置默认值，如何传入的fileList发生更改，会彻底覆盖组件中的files数据。
@@ -96,8 +76,11 @@ export default {
   data () {
     return {
       files: [],
-      // 解决多图同时上传问题
-      tempIndex: 0
+      // when multiple picture upload together, uid will same.
+      // So need to set a auto increment value tempIndex to ensure uid is unique value
+      tempIndex: 0,
+      // store all uploading files xhr instance, so that can invoke xhr.abort to cancel upload request
+      reqs: {}
     };
   },
   methods: {
@@ -105,31 +88,28 @@ export default {
       // e.target.files is pseudo array, need to convert to real array
       const rawFiles = Array.from(e.target.files);
       const files = this.normalizeFiles(rawFiles);
-      if (!this.beforeUpload || this.beforeUpload(files, this.files)) {
+      if (!this.beforeUpload || this.beforeUpload(files)) {
         this.doUpload(files);
       }
     },
-    start () {
-
-    },
     doUpload (files) {
       files.forEach(file => {
+        const { uid } = file;
         const options = {
           url: this.action,
           name: this.name,
           file: file.raw,
           data: this.data,
-          onSuccess: this.onSuccess.bind(this, file),
-          onError: this.onError.bind(this, file),
-          onProgress: this.onProgress.bind(this, file)
+          onSuccess: this.handleSuccess.bind(this, file),
+          onError: this.handleError.bind(this, file),
+          onProgress: this.handleProgress.bind(this, file)
         };
         file.status = 'pending';
-        if (this.onChange) {
-          this.onChange(file, this.files);
-        }
-        const result = this.customHttpRequest(options);
-        if (result instanceof Promise) {
-          result.then(this.onSuccess, this.onError);
+        this.onChange(file, this.files);
+        const req = this.customHttpRequest(options);
+        this.reqs[uid] = req;
+        if (req instanceof Promise) {
+          req.then(options.onSuccess, options.handleError);
         }
       });
     },
@@ -146,95 +126,53 @@ export default {
         };
       });
       // concat does not change the existing arrays, but instead returns a new array
-      // concat 不会修改已经存在的数组而是会返回一个新数组
       this.files = this.files.concat(files);
       return files;
     },
-    onError (file, error) {
-      console.log('error', error);
+    handleError (file, error) {
+      const { uid } = file;
+      delete this.reqs[uid];
       file.status = 'failure';
+      this.onError(error, file, this.files);
     },
-    onSuccess (file, response) {
+    handleSuccess (file, response) {
+      const { uid } = file;
+      delete this.reqs[uid];
       file.status = 'success';
       this.$set(file, 'response', response);
+      // Not only front end can implement picture preview but also back end can do it. Here make use of back end api
       this.$set(file, 'url', response.data.path);
-      if (this.onChange) {
-        this.onChange(file, this.files);
-      }
+      this.onChange(file, this.files);
+      this.onSuccess(response, file, this.files);
     },
-    onProgress (file, event) {
+    handleProgress (file, event) {
       file.percent = event.loaded / event.total * 100;
-      if (this.onChange) {
-        this.onChange(file, this.files);
-      }
+      this.onChange(file, this.files);
+      this.onProgress(event, file, this.files);
     },
     onClickTrigger () {
       this.$refs.input.click();
     },
-    isImage (type) {
-      if (!type) {return;}
-      return type.includes('image');
-    },
-    onDelete (i) {
+    onDelete (file) {
+      const i = this.files.indexOf(file);
       this.files.splice(i, 1);
+      this.abort(file);
+    },
+    abort (file) {
+      const { uid } = file;
+      if (this.reqs[uid]) {
+        this.reqs[uid].abort();
+      }
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
-@import "~@/assets/styles/mixins.scss";
-@import "~@/assets/styles/vars.scss";
 .go-upload {
   .go-upload-input {
     display: none;
     align-items: center;
-  }
-  .go-upload-list {
-  }
-  .go-upload-list-item {
-    margin-top: 8px;
-    padding: 8px;
-    border-radius: 2px;
-    display: flex;
-    align-items: center;
-    border: 1px solid #d9d9d9;
-  }
-  .go-upload-list-item.failure {
-    border: 1px solid $danger;
-    color: $danger;
-  }
-  .go-upload-list-item.success {
-    .go-upload-list-item-name {
-      color: $primary;
-    }
-  }
-  .go-upload-list-item-name {
-    margin-left: 8px;
-    flex: 1;
-    @include ellipsis;
-  }
-  .go-upload-list-item-delete {
-    cursor: pointer;
-  }
-  .go-upload-list-item-img {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    & > img {
-      width: 100%;
-      height: 100%;
-    }
-  }
-  .go-upload-item-img-loading {
-    font-size: 20px;
-    @include spinner;
-  }
-  .go-upload-item-error,
-  .go-upload-item-file {
-    font-size: 38px;
   }
 }
 </style>

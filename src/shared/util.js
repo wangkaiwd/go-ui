@@ -3,3 +3,5 @@ export const entries = (obj, cb) => {
     cb(key, val);
   });
 };
+
+export const noop = () => {};

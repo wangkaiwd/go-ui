@@ -40,6 +40,7 @@ const request = ({
     console.log('e', e);
     onError && onError(e);
   });
+  return xhr;
 };
 
 export default request;
