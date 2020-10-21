@@ -24,21 +24,23 @@ const request = ({
   const formData = new FormData();
   formData.append(name, file);
   entries(data, (key, val) => formData.append(key, val));
-  xhr.upload.onprogress = onProgress;
+  xhr.upload.addEventListener('progress', (e) => {
+    e.percent = e.loaded / e.total * 100;
+    onProgress(e);
+  });
   xhr.open('POST', url);
   xhr.send(formData);
   xhr.addEventListener('load', () => {
     if (xhr.status >= 200 && xhr.status < 300) {
       const response = processResponse(xhr.response);
-      onSuccess && onSuccess(response);
+      onSuccess(response);
     } else {
-      onError && onError('error');
+      onError(new Error('upload request failed!'));
     }
   });
 
   xhr.addEventListener('error', (e) => {
-    console.log('e', e);
-    onError && onError(e);
+    onError(e);
   });
   return xhr;
 };
