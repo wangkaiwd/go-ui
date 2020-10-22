@@ -141,7 +141,7 @@ export default {
 ```
 只要点击`type=file`对应的`input`，就会弹出对应的上传文件窗口。但是由于原生的`input`比较丑，我们可以将其隐藏(`display:none`)，然后通过手动触发`input`的`click`事件来进而触发`input`的`change`事件。
 
-具体的细节再[`mdn`](https://developer.mozilla.org/zh-CN/docs/Web/API/File/Using_files_from_web_applications) 中有介绍:  
+具体的细节在[`mdn`](https://developer.mozilla.org/zh-CN/docs/Web/API/File/Using_files_from_web_applications) 中有介绍:  
 ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201019111435.png)
 
 在组件中，当用户点击`slot`中的按钮时，`click`事件会冒泡到`go-upload-trigger`对应的`div`，我们可以监听`go-upload-trigger`的`click`事件，然后再调用`input`的`click`进而弹出上传窗口：
@@ -182,7 +182,7 @@ export default {
 
 文件上传可以使用`FormData`来实现，`FormData`可以轻易地构造出一组代表`form`字段和它们值的`key/value`键值对，而不用我们再在页面中书写`form`表单。
 
-为了方便使用，用户传入的`data`是一个对象，我们需要遍历其中的每一项，然后将`key/value`通过`append`方法追加到`formData`中，然后传给服务端，源码如下：
+为了方便使用，用户传入的`data`是一个对象，我们需要遍历其中的每一项，然后将`key/value`通过`append`方法追加到`formData`中，传给服务端。源码如下：
 ```javascript
 // XMLHttpRequest常用的三个事件： error/load/progress
 import { entries } from '@/shared/util';
@@ -272,6 +272,8 @@ export default {
 </script>
 ```
 上传之前会通过`limit`来判断上传的数量是否超过了限制，如果超过的话回调用用户传入的`onExceed`方法，并停止上传。
+
+> 注意：`e.target.files`获取到的是一个伪数组，需要我们转换成真正的数组才能调用数组的方法。
 
 在`startUpload`方法中，我们会遍历用户选择的每个文件，然后依次进行上传。在真正上传之前，会执行`normalizeFiles`将原生的`file`对象进行格式化，处理成组件中方便使用的格式：
 ```vue
