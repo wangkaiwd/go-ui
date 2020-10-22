@@ -271,7 +271,7 @@ export default {
 }
 </script>
 ```
-上传之前会通过`limit`来判断上传的数量是否超过了限制，如果超过的话回调用用户传入的`onExceed`方法，并停止上传。
+上传之前会通过`limit`来判断上传的数量是否超过了限制，如果超过的话会调用用户传入的`onExceed`方法，并停止上传。
 
 > 注意：`e.target.files`获取到的是一个伪数组，需要我们转换成真正的数组才能调用数组的方法。
 
@@ -294,7 +294,7 @@ export default {
         size: rawFile.size, // 文件尺寸
         type: rawFile.type, // 文件类型
         percent: 0, // 上传进度
-        uid: Date.now() + this.tempIndex++, // 唯一表示
+        uid: Date.now() + this.tempIndex++, // 唯一标识
         status: 'init', // value list: init pending success failure
         raw: rawFile // 原生文件对象
       };
@@ -306,7 +306,7 @@ export default {
 }
 </script>
 ```
-在格式化`file`对象的时候，需要我们生成唯一的`uid`来标识每一个上传的文件信息。这里我们使用了`Date.now()`来生成随机数，但是在进行多文件上传的时候，会同时上传多个文件，导致`uid`重复，所以我们为其加上`tempIndex`，防止重复。
+在格式化`file`对象的时候，需要我们生成唯一的`uid`来标识每一个上传的文件信息。这里我们使用了`Date.now()`来生成唯一值，但是在进行多文件上传的时候，会**同时**上传多个文件，导致`uid`重复。所以我们为其加上一个自增的`tempIndex`，防止重复。
 
 在拿到格式化后的文件后，将会进入真正的上传环节： 
 ```vue
@@ -396,7 +396,7 @@ export default {
 这里会利用到之前格式化后的文件信息，用于展示文件的状态、加载进度条等，并展示图片上传成功后的缩略图。
 
 ### 拖拽上传
-我们也支持用户将文件拖拽到一个拖拽区域内进行上传，通过`drop`事件的事件对象中的`e.dataTransfer.files`来获取到上传的文件对象，然后和普通上传一样对文件对象处理并发送`XMLHttpRequest`请求。代码如下：  
+我们也支持用户将文件拖拽到一个拖拽区域内进行上传。通过`drop`事件的事件对象中的`e.dataTransfer.files`来获取到上传的文件对象，然后和普通上传一样对文件对象处理并发送`XMLHttpRequest`请求。代码如下：  
 ```vue
 <template>
   <div
@@ -485,7 +485,7 @@ export default{
 }
 </script>
 ```
-父组件中会通过`@`来监听`handle-files`对应的方法，并调用之前的上传函数，此后的上传过程与普通上传完全相同。
+父组件中会通过`@`来监听`handle-files`对应的方法，并调用之前的上传函数，此后的上传过程与普通上传完全相同。上边代码中，拖拽区域也可以起到上传操作触发按钮的作用，点击区域后，会调用`onClickTrigger`方法来唤起文件选择界面。
 
 在[`mdn`](https://developer.mozilla.org/zh-CN/docs/Web/API/File/Using_files_from_web_applications) 中有对拖拽上传进行介绍，有兴趣的小伙伴可以进行查阅：  
 ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201022112851.png)
