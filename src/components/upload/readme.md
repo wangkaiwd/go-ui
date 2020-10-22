@@ -42,6 +42,7 @@ const app = new Koa();
 // deploy to heroku will use environment variable
 const PORT = process.env.PORT || 3000;
 const router = new Router();
+// set upload files store directory
 const upload = multer({ dest: 'uploads' });
 app.use(serve('.'));
 app.use(cors());
@@ -107,9 +108,9 @@ export default {
 };
 </script>
 ```
-组件通过插槽的形式来放置文件上传的触发按钮，并且接收`name`以及`action`属性。
+组件通过插槽的形式来放置文件上传的触发按钮，接收`name`和`action`属性，并且通过`multiple`属性支持多文件上传
 
-`name`属性是我们和服务端约定好的文件上传的`key`，而`action`则是组件的上传地址。下面我们开始组件的实现。
+下面我们开始组件的实现。
 
 ### 触发`Input`的`change`事件
 根据组件的使用方式，我们可以写出下面的代码：
