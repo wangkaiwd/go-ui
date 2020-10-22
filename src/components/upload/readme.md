@@ -246,7 +246,7 @@ export default request;
 
 最终`request`函数会返回`xhr`，方便之后调用`xhr`的属性和方法，如：通过`xhr.abort()`来取消请求。
 
-> 注意：**`xhr.upload`的`progress`事件必须在调用`xhr.open`之前进行监听，否则不会生效**，想要了解的小伙伴可以看这里: [xhr.upload.onprogress doesn't work](https://stackoverflow.com/a/14161642/12819402)
+> 注意：**`xhr.upload`的`progress`事件必须在调用`xhr.open`之前进行监听，否则不会生效**([xhr.upload.onprogress doesn't work](https://stackoverflow.com/a/14161642/12819402))
 
 ### 开始上传
 用户选择的文件在`input`的`change`事件的事件对象中：`e.target.files`，然后通过`uploadFiles`进行上传文件
@@ -356,11 +356,143 @@ export default {
 现在我们可以成功的处理上传过程中文件的不同状态，接下来我们在页面中进行展示。
 
 ### 上传列表
-
+所有的正在上传和已经上传完成的文件会放到`files`中来进行展示：  
+```vue
+<script>
+export default {
+  data () {
+    return {
+      files: [],
+    };
+  },
+}
+</script>
+```
+封装`upload-list`组件，并传入`files`展示文件的整个上传过程：  
+```vue
+<template>
+  <div class="go-upload-list">
+    <div :class="['go-upload-list-item',file.status]" v-for="(file,i) in files" :key="file.uid">
+      <!--  FIXME:code in here is so chaos, can it become more elegance?  -->
+      <div class="go-upload-list-item-img">
+        <go-icon v-if="file.status === 'pending'" class="go-upload-item-img-loading" name="loading"></go-icon>
+        <template v-else-if="file.status === 'success'">
+          <img v-if="isImage(file.type)" class="go-upload-list-item-img" :src="file.url" alt="">
+          <go-icon v-else class="go-upload-item-file" name="file"></go-icon>
+        </template>
+        <go-icon v-else class="go-upload-item-img-error" name="picture"></go-icon>
+      </div>
+      <div class="go-upload-list-item-name">
+        <span>{{ file.name }}</span>
+        <my-progress v-if="file.status === 'pending'" :percent="file.percent"></my-progress>
+      </div>
+    </div>
+  </div>
+</template>
+```
+这里会利用到之前格式化后的文件信息，用于展示文件的状态、加载进度条等，并展示图片上传成功后的缩略图。
 
 ### 拖拽上传
+我们也支持用户将文件拖拽到一个拖拽区域内进行上传，通过`drop`事件的事件对象中的`e.dataTransfer.files`来获取到上传的文件对象，然后和普通上传一样对文件对象处理并发送`XMLHttpRequest`请求。代码如下：  
+```vue
+<template>
+  <div
+    class="go-upload-dragger"
+    :class="{dragging}"
+    @dragenter="onDragenter"
+    @dragleave="onDragleave"
+    @dragover="onDragover"
+    @drop="onDrop"
+    @click="onClick"
+  >
+    <go-icon class="go-upload-dragger-icon" name="upload"></go-icon>
+    <div class="go-upload-dragger-describe">
+      <span>Drop file here or click to upload</span>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'UploadDragger',
+  data () {
+    return {
+      dragging: false
+    };
+  },
+  methods: {
+    onDragenter (e) {
+      this.dragging = true;
+      e.stopPropagation();
+      e.preventDefault();
+    },
+    onDragleave (e) {
+      this.dragging = false;
+      e.stopPropagation();
+      e.preventDefault();
+    },
+    onDragover (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    },
+    onDrop (e) {
+      this.dragging = false;
+      e.stopPropagation();
+      e.preventDefault();
+      const files = e.dataTransfer.files;
+      this.$emit('handle-files', files);
+    },
+    onClick () {
+      this.$emit('on-click');
+    }
+  }
+};
+</script>
+```
+在进入拖拽区域后，我们会设置一个布尔值`dragging`来动态控制`class`，实现用户将文件拖入拖拽区域之后的交互效果。当用户在拖拽区域内松开文件时，调用`drop`事件，此时会将文件对象`files`通过`this.$emit('handle-files',files)`发送给`upload`组件来处理。
+
+```vue
+<template>
+  <div class="go-upload">
+    <!--  omit other code ...  -->
+    <upload-dragger v-if="drag" @on-click="onClickTrigger" @handle-files="uploadFiles"></upload-dragger>
+    <div
+      v-else
+      class="go-upload-trigger"
+      @click="onClickTrigger"
+    >
+      <slot></slot>
+    </div>
+  </div>
+</template>
+<script>
+export default{
+  methods: {
+    onClickTrigger () {
+      this.$refs.input.click();
+    },
+    uploadFiles (rawFiles) {
+      const filesLen = rawFiles.length + this.files.length;
+      if (this.limit && this.limit > filesLen) {
+        return this.onExceed(rawFiles, this.files);
+      }
+      this.startUpload(rawFiles);
+    },    
+  }
+}
+</script>
+```
+父组件中会通过`@`来监听`handle-files`对应的方法，并调用之前的上传函数，此后的上传过程与普通上传完全相同。
+
+在[`mdn`](https://developer.mozilla.org/zh-CN/docs/Web/API/File/Using_files_from_web_applications) 中有对拖拽上传进行介绍，有兴趣的小伙伴可以进行查阅：  
+![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201022112851.png)
 
 ### 结语
 组件完成后，可以部署到`GitHub Pages`在网络中进行分享，具体的部署过程：[部署Vue项目到GitHub Pages](https://github.com/wangkaiwd/vue-component-communication/blob/master/deploy.md)
 
 希望在看完这篇文章后能帮助阅读的小伙伴明白上传组件的具体实现逻辑，并且可以更好的使用社区流行框架中的`Upload`组件，并对其进行二次封装。
+
+参考资料：
+* [Using files from web applications](https://developer.mozilla.org/en-US/docs/Web/API/File/Using_files_from_web_applications)
+* [Element](https://element.eleme.cn/#/en-US)
+* [heroku](https://www.heroku.com/home)
