@@ -487,6 +487,8 @@ export default{
 在[`mdn`](https://developer.mozilla.org/zh-CN/docs/Web/API/File/Using_files_from_web_applications) 中有对拖拽上传进行介绍，有兴趣的小伙伴可以进行查阅：  
 ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201022112851.png)
 
+到这里，我们已经实现了上传组件的一些常见功能，可以进行一些开心的尝试了🤣!
+
 ### 结语
 组件完成后，可以部署到`GitHub Pages`在网络中进行分享，具体的部署过程：[部署Vue项目到GitHub Pages](https://github.com/wangkaiwd/vue-component-communication/blob/master/deploy.md)
 
