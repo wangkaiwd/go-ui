@@ -16,6 +16,9 @@ import GoTabs from '@/components/tabs/tabs';
 import GoTabPane from '@/components/tabs/tab-pane';
 import GoMessage from '@/components/message/index';
 import GoUpload from '@/components/upload/upload';
+import GoDatePicker from '@/components/date-picker/date-picker';
+import GoDateRangePicker from '@/components/date-picker/date-range-picker';
+import GoTable from '@/components/table/table';
 
 Vue.component(GoButton.name, GoButton);
 Vue.component(GoIcon.name, GoIcon);
@@ -29,6 +32,9 @@ Vue.component(GoCol.name, GoCol);
 Vue.component(GoTabs.name, GoTabs);
 Vue.component(GoTabPane.name, GoTabPane);
 Vue.component(GoUpload.name, GoUpload);
+Vue.component(GoDatePicker.name, GoDatePicker);
+Vue.component(GoDateRangePicker.name, GoDateRangePicker);
+Vue.component(GoTable.name, GoTable);
 Vue.use(GoLazyLoad, {
   preload: 1.3,
   error: require('@/demo/lazy-load/error.png'),
