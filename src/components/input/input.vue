@@ -1,7 +1,12 @@
 <template>
   <div class="go-input">
     <go-icon class="go-input-prefix-icon" v-if="prefix" :name="prefix"></go-icon>
-    <input :class="{'go-input-prefix':prefix}" type="text" v-bind="$attrs">
+    <input
+      :class="{'go-input-prefix':prefix}"
+      type="text"
+      v-bind="$attrs"
+      v-on="$listeners"
+    >
   </div>
 </template>
 
