@@ -59,7 +59,9 @@ export default {
     onClickBody (e) { // Vue内部会自动帮我们修改this指向
       const { picker, popover } = this.$refs;
       if (!popover) {return;}
-      if (picker.contains(e.target) || popover.contains(e.target)) {return; }
+      if (picker.contains(e.target) || popover.contains(e.target)) {
+        return;
+      }
       this.visible = false;
     }
   }
