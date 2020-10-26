@@ -50,12 +50,18 @@ export default {
     }
   },
   mounted () {
-    document.body.addEventListener('click', (e) => {
+    document.body.addEventListener('click', this.onClickBody);
+  },
+  beforeDestroy () {
+    document.body.removeEventListener('click', this.onClickBody);
+  },
+  methods: {
+    onClickBody (e) { // Vue内部会自动帮我们修改this指向
       const { picker, popover } = this.$refs;
       if (!popover) {return;}
       if (picker.contains(e.target) || popover.contains(e.target)) {return; }
       this.visible = false;
-    });
+    }
   }
 };
 </script>
