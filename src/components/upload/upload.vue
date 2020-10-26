@@ -89,7 +89,7 @@ export default {
     },
     uploadFiles (rawFiles) {
       const filesLen = rawFiles.length + this.files.length;
-      if (this.limit && this.limit > filesLen) {
+      if (this.limit && this.limit < filesLen) {
         return this.onExceed(rawFiles, this.files);
       }
       this.startUpload(rawFiles);
