@@ -22,6 +22,7 @@ export const routes = [
       { path: '/tabs', name: 'Tabs', component: () => import('@/demo/tabs/tabs') },
       { path: '/message', name: 'Message', component: () => import('@/demo/message/message') },
       { path: '/upload', name: 'Upload', component: () => import('@/demo/upload/upload') },
+      { path: '/date-picker', name: 'DatePicker', component: () => import('@/demo/date-picker/date-picker') },
     ]
   }
 ];

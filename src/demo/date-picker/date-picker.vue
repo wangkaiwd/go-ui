@@ -1,12 +1,12 @@
 <template>
   <div class="date-picker">
-    <go-input prefix="calendar" placeholder="请选择时间" style="width:100%"></go-input>
+    <go-date-picker></go-date-picker>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'GoDatePicker',
+  name: 'DatePicker',
   data () {
     return {};
   },
@@ -14,7 +14,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.go-date-picker {
+.date-picker {
 
 }
 </style>
