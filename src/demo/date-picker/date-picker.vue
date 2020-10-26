@@ -1,6 +1,6 @@
 <template>
   <div class="date-picker">
-    <go-date-picker></go-date-picker>
+    <go-date-picker v-model="value"></go-date-picker>
   </div>
 </template>
 
@@ -8,7 +8,9 @@
 export default {
   name: 'DatePicker',
   data () {
-    return {};
+    return {
+      value: undefined
+    };
   },
 };
 </script>

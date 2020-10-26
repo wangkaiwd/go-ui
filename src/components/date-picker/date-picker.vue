@@ -4,7 +4,7 @@
     <div ref="popover" class="go-date-picker-popover" v-if="visible">
       <div class="go-date-picker-popover-header">
         <span class="go-date-picker-prev">‹</span>
-        <span class="go-date-picker-info">2020年10月26日</span>
+        <span class="go-date-picker-info">{{ formatDate.year }}年{{ formatDate.month }}月{{ formatDate.day }}日</span>
         <span class="go-date-picker-next">›</span>
       </div>
       <div class="go-date-picker-popover-content">
@@ -21,13 +21,33 @@
 </template>
 
 <script>
+const getYearMonthDay = (value) => {
+  const date = new Date(value);
+  const day = date.getDate();
+  const month = date.getMonth();
+  const year = date.getFullYear();
+  return [year, month, day];
+};
 export default {
   name: 'GoDatePicker',
+  props: {
+    value: {
+      type: Date,
+      default: () => new Date()
+    }
+  },
   data () {
     return {
       visible: false,
-      mode: 'day'
+      mode: 'day',
+      tempValue: this.value
     };
+  },
+  computed: {
+    formatDate () {
+      const [year, month, day] = getYearMonthDay(this.tempValue);
+      return { year, month: month + 1, day };
+    }
   },
   mounted () {
     document.body.addEventListener('click', (e) => {
