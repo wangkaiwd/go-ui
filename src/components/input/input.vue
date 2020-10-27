@@ -2,10 +2,12 @@
   <div class="go-input">
     <go-icon class="go-input-prefix-icon" v-if="prefix" :name="prefix"></go-icon>
     <input
+      :value="value"
       :class="{'go-input-prefix':prefix}"
       type="text"
       v-bind="$attrs"
       v-on="$listeners"
+      @input="onInput"
     >
   </div>
 </template>
@@ -16,6 +18,14 @@ export default {
   props: {
     prefix: {
       type: String
+    },
+    value: {
+      type: [String, Number]
+    }
+  },
+  methods: {
+    onInput (e) {
+      this.$emit('input', e.target.value);
     }
   },
   data () {

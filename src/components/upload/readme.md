@@ -324,7 +324,7 @@ export default {
         onProgress: this.handleProgress.bind(this, file)
       };
       file.status = 'pending';
-      this.onChange(file, this.files);
+      this.onInput(file, this.files);
       const req = this.customHttpRequest(options);
       if (req instanceof Promise) {
         req.then(options.onSuccess, options.handleError);
@@ -335,7 +335,7 @@ export default {
       this.$set(file, 'response', response);
       // Not only front end can implement picture preview but also back end can do it. Here make use of back end api
       this.$set(file, 'url', response.data.path);
-      this.onChange(file, this.files);
+      this.onInput(file, this.files);
       this.onSuccess(response, file, this.files);
     },
     handleError (file, error) {
@@ -344,7 +344,7 @@ export default {
     },
     handleProgress (file, event) {
       file.percent = event.percent;
-      this.onChange(file, this.files);
+      this.onInput(file, this.files);
       this.onProgress(event, file, this.files);
     },
   }

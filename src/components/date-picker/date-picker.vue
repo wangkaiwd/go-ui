@@ -1,6 +1,13 @@
 <template>
   <div class="go-date-picker" ref="picker">
-    <go-input @focus="visible=true" prefix="calendar" placeholder="请选择时间" style="width:100%"></go-input>
+    <go-input
+      class="go-date-picker-input"
+      @focus="visible=true"
+      v-model="displayValue"
+      prefix="calendar"
+      placeholder="请选择时间"
+    >
+    </go-input>
     <div ref="popover" class="go-date-picker-popover" v-if="visible">
       <div class="go-date-picker-popover-header">
         <span class="go-date-picker-prev" @click="changeMonth(-1)">‹</span>
@@ -17,8 +24,9 @@
           <div class="go-date-picker-days-row" v-for="row in getDays">
             <div
               class="go-date-picker-days-cell"
-              :class="`${cell.status}`"
+              :class="dayClasses(cell)"
               v-for="cell in row"
+              @click="onClickDay(cell)"
             >
               {{ getDay(cell) }}
             </div>
@@ -67,6 +75,10 @@ export default {
       const [year, month, day] = getYearMonthDay(this.tempValue);
       return { year, month: month + 1, day };
     },
+    displayValue () {
+      const [year, month, day] = getYearMonthDay(this.value);
+      return `${year}-${month + 1}-${day}`;
+    },
     getDays () {
       const [year, month] = getYearMonthDay(this.tempValue);
       // 0 ~ 6, 需要往前推 startWeek + 1天
@@ -77,6 +89,11 @@ export default {
       return this.createMatrix(days, 7);
     },
   },
+  watch: {
+    value (val) {
+      this.tempValue = val;
+    }
+  },
   mounted () {
     document.body.addEventListener('click', this.onClickBody);
   },
@@ -84,6 +101,24 @@ export default {
     document.body.removeEventListener('click', this.onClickBody);
   },
   methods: {
+    dayClasses (cell) {
+      console.log(cell.date.getMonth() + 1);
+      return {
+        prev: cell.status === 'prev',
+        next: cell.status === 'next',
+        active: this.isSameDay(cell.date, this.value)
+      };
+    },
+    onClickDay (cell) {
+      this.$emit('input', cell.date);
+      this.visible = false;
+    },
+    isSameDay (date1, date2) {
+      const [y1, m1, d1] = getYearMonthDay(date1);
+      const [y2, m2, d2] = getYearMonthDay(date2);
+      console.log('m1,m2', m1, m2);
+      return y1 === y2 && m1 === m2 && d1 === d2;
+    },
     onClickBody (e) { // Vue内部会自动帮我们修改this指向
       const { picker, popover } = this.$refs;
       if (!popover) {return;}
@@ -155,6 +190,9 @@ export default {
 @import "~@/assets/styles/vars.scss";
 .go-date-picker {
   position: relative;
+  .go-date-picker-input {
+    width: 100%;
+  }
   .go-date-picker-popover {
     color: #65708c;
     padding: 20px;
@@ -198,6 +236,10 @@ export default {
   .go-date-picker-days-cell.next {
     color: $gray500;
     font-weight: 300;
+  }
+  .go-date-picker-days-cell.active {
+    background-color: $info;
+    color: $white;
   }
   .go-date-picker-popover-header {
     display: flex;
