@@ -9,9 +9,18 @@
       </div>
       <div class="go-date-picker-popover-content">
         <div class="go-date-picker-days">
-          <div class="go-date-picker-days-row" v-for="row in 6">
-            <div class="go-date-picker-days-cell" v-for="cell in 7">
-              {{ cell + (row - 1) * 7 }}
+          <div class="go-date-picker-weeks">
+            <div class="go-date-picker-week-cell" v-for="week in weeks">
+              {{ week }}
+            </div>
+          </div>
+          <div class="go-date-picker-days-row" v-for="row in getDays">
+            <div
+              class="go-date-picker-days-cell"
+              :class="`${cell.status}`"
+              v-for="cell in row"
+            >
+              {{ getDay(cell) }}
             </div>
           </div>
         </div>
@@ -51,18 +60,27 @@ export default {
     return {
       visible: false,
       mode: 'day',
-      tempValue: this.value
+      tempValue: this.value,
+      weeks: ['一', '二', '三', '四', '五', '六', '日']
     };
   },
   computed: {
     formatDate () {
       const [year, month, day] = getYearMonthDay(this.tempValue);
       return { year, month: month + 1, day };
-    }
+    },
+    getDays () {
+      const [year, month] = getYearMonthDay(this.tempValue);
+      // 0 ~ 6, 需要往前推 startWeek + 1天
+      const startWeek = new Date(year, month, 1).getDay();
+      const prevLastDay = getPrevMonthLastDay(year, month);
+      const curLastDay = getCurrentMonthLastDay(year, month);
+      const days = [...this.getPrevMonthDays(prevLastDay, startWeek), ...this.getCurrentMonthDays(curLastDay), ...this.getNextMonthDays(curLastDay, startWeek)];
+      return this.createMatrix(days, 7);
+    },
   },
   mounted () {
     document.body.addEventListener('click', this.onClickBody);
-    this.getDays();
   },
   beforeDestroy () {
     document.body.removeEventListener('click', this.onClickBody);
@@ -76,17 +94,22 @@ export default {
       }
       this.visible = false;
     },
+    // 42个，每行7个
     createMatrix (array, rowLength) {
-
+      const newArray = [];
+      let temp = [];
+      array.forEach((item, i) => {
+        temp.push(item);
+        if ((i + 1) % rowLength === 0) {
+          newArray.push(temp);
+          temp = [];
+        }
+      });
+      if (temp.length) {newArray.push(temp);}
+      return newArray;
     },
-    getDays () {
-      const [year, month, day] = getYearMonthDay(this.tempValue);
-      // 0 ~ 6, 需要往前推 startWeek + 1天
-      const startWeek = new Date(year, month, 1).getDay();
-      const prevLastDay = getPrevMonthLastDay(year, month);
-      const curLastDay = getCurrentMonthLastDay(year, month);
-      const days = [...this.getPrevMonthDays(prevLastDay, startWeek), ...this.getCurrentMonthDays(curLastDay), ...this.getNextMonthDays(curLastDay, startWeek)];
-      console.log(days.map(day => day.date.getDate()));
+    getDay (cell) {
+      return cell.date.getDate();
     },
     getPrevMonthDays (prevLastDay, startWeek) {
       const [year, month] = getYearMonthDay(this.tempValue);
@@ -139,10 +162,12 @@ export default {
     border-radius: 6px;
     box-shadow: 0 10px 50px 0 rgba(0, 0, 0, .2);
   }
-  .go-date-picker-days-row {
+  .go-date-picker-days-row,
+  .go-date-picker-weeks {
     display: flex;
   }
   .go-date-picker-days-cell,
+  .go-date-picker-week-cell,
   .go-date-picker-prev,
   .go-date-picker-next {
     width: 36px;
@@ -150,6 +175,11 @@ export default {
     line-height: 36px;
     text-align: center;
     cursor: pointer;
+  }
+  .go-date-picker-days-cell.prev,
+  .go-date-picker-days-cell.next {
+    color: $gray500;
+    font-weight: 300;
   }
   .go-date-picker-popover-header {
     display: flex;
