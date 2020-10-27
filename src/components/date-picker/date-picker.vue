@@ -3,9 +3,9 @@
     <go-input @focus="visible=true" prefix="calendar" placeholder="请选择时间" style="width:100%"></go-input>
     <div ref="popover" class="go-date-picker-popover" v-if="visible">
       <div class="go-date-picker-popover-header">
-        <span class="go-date-picker-prev">‹</span>
+        <span class="go-date-picker-prev" @click="changeMonth(-1)">‹</span>
         <span class="go-date-picker-info">{{ formatDate.year }}年{{ formatDate.month }}月{{ formatDate.day }}日</span>
-        <span class="go-date-picker-next">›</span>
+        <span class="go-date-picker-next" @click="changeMonth(1)">›</span>
       </div>
       <div class="go-date-picker-popover-content">
         <div class="go-date-picker-days">
@@ -30,8 +30,6 @@
 </template>
 
 <script>
-// 如何展示当前页所有天数？
-//   1. 找到当月的第一天，判断它是星期几（天数最少28，上边和下边个空开一行）
 const getYearMonthDay = (value) => {
   const date = new Date(value);
   const day = date.getDate();
@@ -143,6 +141,11 @@ export default {
         });
       }
       return nextMonthDays;
+    },
+    changeMonth (value) {
+      const [, month] = getYearMonthDay(this.tempValue);
+      const timestamp = this.tempValue.setMonth(month + value);
+      this.tempValue = new Date(timestamp);
     }
   }
 };
@@ -175,6 +178,21 @@ export default {
     line-height: 36px;
     text-align: center;
     cursor: pointer;
+    border-radius: 6px;
+  }
+  .go-date-picker-week-cell {
+    cursor: default;
+  }
+  .go-date-picker-days-cell {
+    border-radius: 50%;
+  }
+  .go-date-picker-prev,
+  .go-date-picker-next,
+  .go-date-picker-info,
+  .go-date-picker-days-cell {
+    &:hover {
+      background: #eee;
+    }
   }
   .go-date-picker-days-cell.prev,
   .go-date-picker-days-cell.next {
@@ -183,10 +201,12 @@ export default {
   }
   .go-date-picker-popover-header {
     display: flex;
-    align-items: center;
   }
   .go-date-picker-info {
+    cursor: pointer;
+    line-height: 36px;
     text-align: center;
+    border-radius: 6px;
     flex: 1;
   }
 }
