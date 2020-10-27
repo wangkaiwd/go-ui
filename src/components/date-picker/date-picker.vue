@@ -21,12 +21,23 @@
 </template>
 
 <script>
+// 如何展示当前页所有天数？
+//   1. 找到当月的第一天，判断它是星期几（天数最少28，上边和下边个空开一行）
 const getYearMonthDay = (value) => {
   const date = new Date(value);
   const day = date.getDate();
   const month = date.getMonth();
   const year = date.getFullYear();
   return [year, month, day];
+};
+
+// https://stackoverflow.com/a/13773408/12819402
+const getCurrentMonthLastDay = (year, month) => {
+  return new Date(year, month + 1, 0).getDate();
+};
+// https://stackoverflow.com/a/37803823/12819402
+const getPrevMonthLastDay = (year, month) => {
+  return new Date(year, month, 0).getDate();
 };
 export default {
   name: 'GoDatePicker',
@@ -51,6 +62,7 @@ export default {
   },
   mounted () {
     document.body.addEventListener('click', this.onClickBody);
+    this.getDays();
   },
   beforeDestroy () {
     document.body.removeEventListener('click', this.onClickBody);
@@ -63,6 +75,51 @@ export default {
         return;
       }
       this.visible = false;
+    },
+    createMatrix (array, rowLength) {
+
+    },
+    getDays () {
+      const [year, month, day] = getYearMonthDay(this.tempValue);
+      // 0 ~ 6, 需要往前推 startWeek + 1天
+      const startWeek = new Date(year, month, 1).getDay();
+      const prevLastDay = getPrevMonthLastDay(year, month);
+      const curLastDay = getCurrentMonthLastDay(year, month);
+      const days = [...this.getPrevMonthDays(prevLastDay, startWeek), ...this.getCurrentMonthDays(curLastDay), ...this.getNextMonthDays(curLastDay, startWeek)];
+      console.log(days.map(day => day.date.getDate()));
+    },
+    getPrevMonthDays (prevLastDay, startWeek) {
+      const [year, month] = getYearMonthDay(this.tempValue);
+      const prevMonthDays = [];
+      for (let i = prevLastDay - startWeek + 1; i <= prevLastDay; i++) {
+        prevMonthDays.push({
+          date: new Date(year, month - 1, i),
+          status: 'prev'
+        });
+      }
+      return prevMonthDays;
+    },
+    getCurrentMonthDays (curLastDay) {
+      const [year, month] = getYearMonthDay(this.tempValue);
+      const curMonthDays = [];
+      for (let i = 1; i <= curLastDay; i++) {
+        curMonthDays.push({
+          date: new Date(year, month, i),
+          status: 'current'
+        });
+      }
+      return curMonthDays;
+    },
+    getNextMonthDays (curLastDay, startWeek) {
+      const [year, month] = getYearMonthDay(this.tempValue);
+      const nextMonthDays = [];
+      for (let i = 1; i <= 42 - startWeek - curLastDay; i++) {
+        nextMonthDays.push({
+          date: new Date(year, month + 1, i),
+          status: 'next'
+        });
+      }
+      return nextMonthDays;
     }
   }
 };
