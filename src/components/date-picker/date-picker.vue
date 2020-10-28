@@ -39,7 +39,7 @@
 
 <script>
 const getYearMonthDay = (value) => {
-  const date = new Date(value);
+  const date = value ? new Date(value) : new Date();
   const day = date.getDate();
   const month = date.getMonth();
   const year = date.getFullYear();
@@ -109,7 +109,8 @@ export default {
       return {
         prev: cell.status === 'prev',
         next: cell.status === 'next',
-        active: this.isSameDay(cell.date, this.value)
+        active: this.isSameDay(cell.date, this.value),
+        today: this.isToday(cell.date)
       };
     },
     onClickDay (cell) {
@@ -119,6 +120,11 @@ export default {
     isSameDay (date1, date2) {
       const [y1, m1, d1] = getYearMonthDay(date1);
       const [y2, m2, d2] = getYearMonthDay(date2);
+      return y1 === y2 && m1 === m2 && d1 === d2;
+    },
+    isToday (date) {
+      const [y1, m1, d1] = getYearMonthDay(date);
+      const [y2, m2, d2] = getYearMonthDay();
       return y1 === y2 && m1 === m2 && d1 === d2;
     },
     onClickBody (e) { // Vue内部会自动帮我们修改this指向
@@ -239,9 +245,14 @@ export default {
     color: $gray500;
     font-weight: 300;
   }
-  .go-date-picker-days-cell.active {
-    background-color: $info;
-    color: $white;
+  .go-date-picker-days-cell {
+    &.today {
+      color: $info;
+    }
+    &.active {
+      background-color: $info;
+      color: $white;
+    }
   }
   .go-date-picker-popover-header {
     display: flex;
