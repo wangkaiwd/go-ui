@@ -74,7 +74,7 @@ export default {
     },
     onClickYear (year) {
       const { month, day } = this.formatDate;
-      this.dispatch('input', new Date(year, day, month), 'GoDatePicker');
+      this.dispatch('input', new Date(year, month, day), 'GoDatePicker');
       this.$emit('mode-change', 'picker-days');
     },
     yearClasses (year) {
@@ -84,11 +84,11 @@ export default {
       };
     },
     isCurrentYear (year) {
-      const [year2] = getYearMonthDay(this.value);
+      const [year2] = getYearMonthDay(new Date());
       return year === year2;
     },
     isSameYear (year) {
-      const [year2, month2] = getYearMonthDay(new Date());
+      const [year2] = getYearMonthDay(this.value);
       return year === year2;
     }
   }

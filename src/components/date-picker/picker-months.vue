@@ -62,7 +62,7 @@ export default {
     onClickMonth (i, j) {
       const month = j + i * 4;
       const { year, day } = this.formatDate;
-      this.dispatch('input', new Date(year, day, month), 'GoDatePicker');
+      this.dispatch('input', new Date(year, month, day), 'GoDatePicker');
       this.$emit('mode-change', 'picker-years');
     },
     monthClasses (i, j) {
@@ -74,12 +74,12 @@ export default {
     },
     isCurrentMonth (month) {
       const year = this.formatDate.year;
-      const [year2, month2] = getYearMonthDay(this.value);
+      const [year2, month2] = getYearMonthDay(new Date());
       return year === year2 && month === month2;
     },
     isSameMonth (month) {
       const year = this.formatDate.year;
-      const [year2, month2] = getYearMonthDay(new Date());
+      const [year2, month2] = getYearMonthDay(this.value);
       return year === year2 && month === month2;
     }
   }
