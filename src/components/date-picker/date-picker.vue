@@ -54,6 +54,10 @@ const getCurrentMonthLastDay = (year, month) => {
 const getPrevMonthLastDay = (year, month) => {
   return new Date(year, month, 0).getDate();
 };
+// https://stackoverflow.com/a/1090817/12819402
+const cloneDate = (date) => {
+  return new Date(date.getTime());
+};
 export default {
   name: 'GoDatePicker',
   props: {
@@ -66,7 +70,7 @@ export default {
     return {
       visible: false,
       mode: 'day',
-      tempValue: this.value,
+      tempValue: cloneDate(this.value),
       weeks: ['一', '二', '三', '四', '五', '六', '日']
     };
   },
@@ -91,7 +95,7 @@ export default {
   },
   watch: {
     value (val) {
-      this.tempValue = val;
+      this.tempValue = cloneDate(val);
     }
   },
   mounted () {
@@ -102,7 +106,6 @@ export default {
   },
   methods: {
     dayClasses (cell) {
-      console.log(cell.date.getMonth() + 1);
       return {
         prev: cell.status === 'prev',
         next: cell.status === 'next',
@@ -116,7 +119,6 @@ export default {
     isSameDay (date1, date2) {
       const [y1, m1, d1] = getYearMonthDay(date1);
       const [y2, m2, d2] = getYearMonthDay(date2);
-      console.log('m1,m2', m1, m2);
       return y1 === y2 && m1 === m2 && d1 === d2;
     },
     onClickBody (e) { // Vue内部会自动帮我们修改this指向
