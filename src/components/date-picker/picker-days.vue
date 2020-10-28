@@ -74,7 +74,7 @@ export default {
     changeMonth (value) {
       const [, month] = getYearMonthDay(this.tempValue);
       const timestamp = cloneDate(this.tempValue).setMonth(month + value);
-      this.$emit('change-month', new Date(timestamp));
+      this.$emit('update:tempValue', new Date(timestamp));
     },
     dayClasses (cell) {
       return {

@@ -49,9 +49,22 @@ export default {
       const [year, month, day] = getYearMonthDay(this.tempValue);
       return { year, month: month + 1, day };
     },
-    displayValue () {
-      const [year, month, day] = getYearMonthDay(this.value);
-      return `${year}-${month + 1}-${day}`;
+    displayValue: {
+      get () {
+        const [year, month, day] = getYearMonthDay(this.value);
+        return `${year}-${month + 1}-${day}`;
+      },
+      set (e) {
+        if (e?.target?.value) {
+          const reg = /(\d+)-(\d+)-(\d+)/;
+          const value = e.target.value;
+          const matched = value.match(reg);
+          if (matched) {
+            const [, year, month, day] = matched;
+            this.$emit('input', new Date(year, month - 1, day));
+          }
+        }
+      }
     },
   },
   watch: {
