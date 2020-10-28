@@ -26,6 +26,7 @@
 import { cloneDate, getYearMonthDay } from '@/shared/date';
 import PickerDays from './picker-days';
 import PickerMonths from './picker-months';
+import PickerYears from './picker-years';
 
 export default {
   name: 'GoDatePicker',
@@ -35,7 +36,7 @@ export default {
       default: () => new Date()
     }
   },
-  components: { PickerDays, PickerMonths },
+  components: { PickerDays, PickerMonths, PickerYears },
   data () {
     return {
       visible: false,
@@ -75,6 +76,7 @@ export default {
     },
     // 42个，每行7个
     onModeChange (mode) {
+      console.log('year', mode);
       this.mode = mode;
       // wait all micro tasks execute complete
       setTimeout(() => {

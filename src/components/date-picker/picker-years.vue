@@ -1,18 +1,18 @@
 <template>
-  <div class="go-picker-months">
+  <div class="go-picker-years">
     <div class="go-date-picker-popover-header">
-      <span class="go-date-picker-prev" @click="changeYear(-1)">‹</span>
-      <span class="go-date-picker-info">{{ formatDate.year }}年</span>
-      <span class="go-date-picker-next" @click="changeYear(1)">›</span>
+      <span class="go-date-picker-prev" @click="changeYear(-10)">‹</span>
+      <span class="go-date-picker-info">{{ startYear }}-{{ endYear }}</span>
+      <span class="go-date-picker-next" @click="changeYear(10)">›</span>
     </div>
     <div class="go-date-picker-popover-content">
-      <div class="go-date-picker-months">
-        <div class="go-date-picker-months-row" v-for="(row,i) in months" :key="`${row}-${i}`">
+      <div class="go-date-picker-years">
+        <div class="go-date-picker-years-row" v-for="(row,i) in years" :key="`${row}-${i}`">
           <div
-            class="go-date-picker-months-cell"
+            class="go-date-picker-years-cell"
             v-for="(cell,j) in row" :key="`${cell}-${j}`"
-            :class="monthClasses(i,j)"
-            @click="onClickMonth(i,j)"
+            :class="yearClasses(cell)"
+            @click="onClickYear(cell)"
           >
             {{ cell }}
           </div>
@@ -27,9 +27,8 @@ import { createMatrix } from '@/shared/util';
 import { cloneDate, getYearMonthDay } from '@/shared/date';
 import emitter from '@/mixins/emitter';
 
-const MONTHS = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
 export default {
-  name: 'PickerMonths',
+  name: 'PickerYears',
   props: {
     tempValue: {
       type: Date
@@ -49,9 +48,23 @@ export default {
   },
   mixins: [emitter],
   data () {
-    return {
-      months: createMatrix(MONTHS, 4)
-    };
+    return {};
+  },
+  computed: {
+    startYear () {
+      const { year } = this.formatDate;
+      return year - year % 10;
+    },
+    endYear () {
+      return this.startYear + 9;
+    },
+    years () {
+      const arr = [];
+      for (let i = this.startYear; i <= this.endYear; i++) {
+        arr.push(i);
+      }
+      return createMatrix(arr, 4);
+    }
   },
   methods: {
     changeYear (value) {
@@ -59,28 +72,24 @@ export default {
       const timestamp = cloneDate(this.tempValue).setFullYear(year + value);
       this.$emit('update:tempValue', new Date(timestamp));
     },
-    onClickMonth (i, j) {
-      const month = j + i * 4;
-      const { year, day } = this.formatDate;
+    onClickYear (year) {
+      const { month, day } = this.formatDate;
       this.dispatch('input', new Date(year, day, month), 'GoDatePicker');
-      this.$emit('mode-change', 'picker-years');
+      this.$emit('mode-change', 'picker-days');
     },
-    monthClasses (i, j) {
-      const month = j + i * 4;
+    yearClasses (year) {
       return {
-        active: this.isSameMonth(month),
-        current: this.isCurrentMonth(month)
+        active: this.isSameYear(year),
+        current: this.isCurrentYear(year)
       };
     },
-    isCurrentMonth (month) {
-      const year = this.formatDate.year;
-      const [year2, month2] = getYearMonthDay(this.value);
-      return year === year2 && month === month2;
+    isCurrentYear (year) {
+      const [year2] = getYearMonthDay(this.value);
+      return year === year2;
     },
-    isSameMonth (month) {
-      const year = this.formatDate.year;
+    isSameYear (year) {
       const [year2, month2] = getYearMonthDay(new Date());
-      return year === year2 && month === month2;
+      return year === year2;
     }
   }
 };
@@ -88,7 +97,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "~@/assets/styles/vars.scss";
-.go-picker-months {
+.go-picker-years {
   .go-date-picker-popover-header {
     display: flex;
   }
@@ -104,7 +113,7 @@ export default {
   .go-date-picker-prev,
   .go-date-picker-next,
   .go-date-picker-info,
-  .go-date-picker-months-cell {
+  .go-date-picker-years-cell {
     &:hover {
       background: #eee;
     }
@@ -116,10 +125,10 @@ export default {
     border-radius: 6px;
     flex: 1;
   }
-  .go-date-picker-months-row {
+  .go-date-picker-years-row {
     display: flex;
   }
-  .go-date-picker-months-cell {
+  .go-date-picker-years-cell {
     width: 56px;
     text-align: center;
     line-height: 56px;
