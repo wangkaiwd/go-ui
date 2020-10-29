@@ -8,7 +8,7 @@
       placeholder="请选择时间"
     >
     </go-input>
-    <div ref="popover" class="go-date-picker-popover" v-if="visible">
+    <div class="go-date-picker-popover" v-if="visible">
       <component
         :is="mode"
         :value="value"
@@ -80,9 +80,8 @@ export default {
   },
   methods: {
     onClickBody (e) { // Vue内部会自动帮我们修改this指向
-      const { picker, popover } = this.$refs;
-      if (!popover) {return;}
-      if (picker.contains(e.target) || popover.contains(e.target)) {
+      const { picker } = this.$refs;
+      if (picker.contains(e.target)) {
         return;
       }
       this.visible = false;

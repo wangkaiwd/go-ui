@@ -3,7 +3,9 @@
 > * [`demo`演示](http://localhost:8080/#/date-picker)
 
 在日常工作中需要填写日期的时候，会用到日期选择器，来方便的进行日、月、年的选择。这里我们会用`Vue`来实现一个日期选择器，效果如下：
-![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/Oct-29-2020%2014-48-17.gif)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/Oct-29-2020%2014-48-17.gif" alt="">
+</p>
 
 实现功能： 
 - [x] 日期选择弹出层
@@ -13,4 +15,124 @@
 - [x] 用户传入的日期值实现双向绑定
 - [x] `CSS`样式美化
 
-### 
+组件的使用方式很简单，只需要传入对应的日期对象`value`即可：  
+```vue
+<template>
+  <div class="date-picker">
+    <go-date-picker v-model="value"></go-date-picker>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'DatePicker',
+  data () {
+    return {
+      value: undefined
+    };
+  },
+};
+</script>
+```
+下面就开始一步步实现组件吧😁！
+
+### 日期选择弹出层
+当用户点击输入框时，会弹出日期选择面板。在组件内部，会通过`visible`来控制弹出层的显示隐藏：  
+```vue
+<template>
+  <div class="go-date-picker" ref="picker">
+    <go-input
+      class="go-date-picker-input"
+      @focus="visible=true"
+      prefix="calendar"
+      placeholder="请选择时间"
+    >
+    </go-input>
+    <div ref="popover" class="go-date-picker-popover" v-if="visible">
+        <!-- day/month/year  panel    -->
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'GoDatePicker',
+  props: {
+    value: {
+      type: Date,
+      default: () => new Date()
+    }
+  },
+  data () {
+    return {
+      visible: false,
+    };
+  },
+  mounted () {
+    document.body.addEventListener('click', this.onClickBody);
+  },
+  beforeDestroy () {
+    document.body.removeEventListener('click', this.onClickBody);
+  },
+  methods: {
+    onClickBody (e) { // Vue内部会自动帮我们修改this指向
+      const { picker, popover } = this.$refs;
+      if (!popover) {return;}
+      // 过滤掉弹出层和日期选择器内的元素
+      if (picker.contains(e.target) || popover.contains(e.target)) {
+        return;
+      }
+      this.visible = false;
+    },
+  }
+};
+</script>
+```
+当输入框激活时，显示弹出层，当点击外部区域时，会隐藏弹出层。需要注意的是当*点击`date-picker`内部，弹出层并不会隐藏*。
+
+`Node.contains(otherNode)`可以用来判断`otherNode`是否是`Node`的后代节点(包括`Node`本身)，返回`Boolean`。这里我们通过这个`api`来判断点击的元素`e.target`是否在`date-picker`内部，如果是的话不会隐藏弹出层，可以让用户在`date-picker`进行相应的操作。
+
+### 展示天面板
+当用户点击输入框后，首先弹出的是天面板，面板头部会显示当前的年月信息。面板主体有6行，会分别包括上月、当前月、下月的天数： 
+![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201029152243.png)
+
+头部信息我们对传入的`value`进行拷贝，在内部通过`tempValue`来进行保存，并且监听`watch`的变化，保证`tempValue`可以获取到`value`的最新值。当我们在内部切换日期面板而并没有选中某个日期时，就不会更新`value`，而只是更新内部的`tempValue`属性：  
+```vue
+<script>
+export default {
+  name: 'GoDatePicker',
+  props: {
+    value: {
+      type: Date,
+      default: () => new Date()
+    }
+  },
+  components: { PickerDays, PickerMonths, PickerYears },
+  data () {
+    return {
+      visible: false,
+      mode: 'picker-days',
+      tempValue: cloneDate(this.value),
+    };
+  },
+  computed: {
+    formatDate () {
+      const [year, month, day] = getYearMonthDay(this.tempValue);
+      return { year, month: month + 1, day };
+    },
+  },
+  watch: {
+    value (val) {
+      this.tempValue = cloneDate(val);
+    }
+  },
+  // some code ...
+};
+</script>
+```
+`formatDate`计算属性会通过`tempValue`计算出当前的年、月、日，方便展示。
+
+内容区域的展示会复杂很多，实现的思路如下：
+* 获取当前月第一天是星期几，推导出前一个月展示的天数
+* 获取当月的展示总天数
+* 总共要展示的天数为42，减去前一个月和当前月展示的天数即为下个月展示的天数
