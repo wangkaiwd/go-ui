@@ -136,3 +136,102 @@ export default {
 * 获取当前月第一天是星期几，推导出前一个月展示的天数
 * 获取当月的展示总天数
 * 总共要展示的天数为42，减去前一个月和当前月展示的天数即为下个月展示的天数
+```vue
+<script>
+export default {
+  name: 'PickerDays',
+  data () {
+    return {
+      weeks: ['一', '二', '三', '四', '五', '六', '日']
+    };
+  },
+  // some code ...
+  computed: {
+    getDays () {
+      const [year, month] = getYearMonthDay(this.tempValue);
+      // 0 ~ 6, 需要往前推 startWeek + 1天
+      const startWeek = new Date(year, month, 1).getDay();
+      const prevLastDay = getPrevMonthLastDay(year, month);
+      const curLastDay = getCurrentMonthLastDay(year, month);
+      const days = [...this.getPrevMonthDays(prevLastDay, startWeek), ...this.getCurrentMonthDays(curLastDay), ...this.getNextMonthDays(curLastDay, startWeek)];
+      // 转换成二维数组
+      return toMatrix(days, 7);
+    },
+  },
+  methods: {
+    // 获取前一个月天数
+    getPrevMonthDays (prevLastDay, startWeek) {
+      const [year, month] = getYearMonthDay(this.tempValue);
+      const prevMonthDays = [];
+      for (let i = prevLastDay - startWeek + 1; i <= prevLastDay; i++) {
+        prevMonthDays.push({
+          date: new Date(year, month - 1, i),
+          status: 'prev'
+        });
+      }
+      return prevMonthDays;
+    },
+    // 获取当前月天数
+    getCurrentMonthDays (curLastDay) {
+      const [year, month] = getYearMonthDay(this.tempValue);
+      const curMonthDays = [];
+      for (let i = 1; i <= curLastDay; i++) {
+        curMonthDays.push({
+          date: new Date(year, month, i),
+          status: 'current'
+        });
+      }
+      return curMonthDays;
+    },
+    // 获取下一个月天数
+    getNextMonthDays (curLastDay, startWeek) {
+      const [year, month] = getYearMonthDay(this.tempValue);
+      const nextMonthDays = [];
+      for (let i = 1; i <= 42 - startWeek - curLastDay; i++) {
+        nextMonthDays.push({
+          date: new Date(year, month + 1, i),
+          status: 'next'
+        });
+      }
+      return nextMonthDays;
+    },
+    getDay (cell) {
+      return cell.date.getDate();
+    },
+  }
+};
+</script>
+```
+我们将前一个月、当前月、下一个月的日期信息组成一个数组，然后转换位为拥有6个子数组，每个子数组中有7条信息的二维数组，方便遍历展示： 
+```vue
+<template>
+  <div class="go-picker-days">
+    <!--  some code ...  -->
+    <div class="go-date-picker-days-row" v-for="(row,i) in getDays" :key="`${row}-${i}`">
+      <div
+        class="go-date-picker-days-cell"
+        v-for="(cell,j) in row"
+        :key="`${cell}-${j}`"
+      >
+        {{ getDay(cell) }}
+      </div>
+    </div>
+  </div>
+</template>
+```
+数组的格式如下： 
+![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201029155114.png)
+
+在计算日期时，如果传入的天数为0，则表示前一个月的最后一天。利用这个特性，可以节省我们很多的计算逻辑：  
+```javascript
+export const getCurrentMonthLastDay = (year, month) => {
+  return new Date(year, month + 1, 0).getDate();
+};
+
+export const getPrevMonthLastDay = (year, month) => {
+  return new Date(year, month, 0).getDate();
+};
+```
+> * [Calculate last day of month in JavaScript](https://stackoverflow.com/a/13773408/12819402)
+> * [How to get the last day of the previous month in Javascript or JQuery](https://stackoverflow.com/a/37803823/12819402)
+
