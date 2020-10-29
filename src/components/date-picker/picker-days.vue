@@ -86,7 +86,6 @@ export default {
     },
     onClickDay (cell) {
       this.dispatch('input', cell.date, 'GoDatePicker');
-      this.$emit('update:visible', false);
     },
     isSameDay (date1, date2) {
       const [y1, m1, d1] = getYearMonthDay(date1);

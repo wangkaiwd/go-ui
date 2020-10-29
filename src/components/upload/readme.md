@@ -327,7 +327,7 @@ export default {
       this.onInput(file, this.files);
       const req = this.customHttpRequest(options);
       if (req instanceof Promise) {
-        req.then(options.onSuccess, options.handleError);
+        req.then(options.onSuccess, options.onError);
       }
     },
     handleSuccess (file, response) {

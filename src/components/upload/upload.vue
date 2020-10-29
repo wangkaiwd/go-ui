@@ -118,7 +118,7 @@ export default {
       const req = this.customHttpRequest(options);
       this.reqs[uid] = req;
       if (req instanceof Promise) {
-        req.then(options.onSuccess, options.handleError);
+        req.then(options.onSuccess, options.onError);
       }
     },
     normalizeFiles (rawFile) {

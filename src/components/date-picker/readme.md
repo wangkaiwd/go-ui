@@ -292,8 +292,157 @@ export default {
 之后便可以为这些不同状态分别添加不同的样式了。
 
 #### 月份切换
+在面板的头部，支持点击左右箭头进行月份切换。其实现利用了`Date.prototype.setMonth`方法：
+```vue
+<template>
+  <div class="go-picker-days">
+    <div class="go-date-picker-popover-header">
+      <span class="go-date-picker-prev" @click="changeMonth(-1)">‹</span>
+      <span class="go-date-picker-info" @click="$emit('mode-change','picker-months')">
+        {{ formatDate.year }}年{{ formatDate.month }}月{{ formatDate.day }}日</span>
+      <span class="go-date-picker-next" @click="changeMonth(1)">›</span>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'PickerDays',
+  methods: {
+    changeMonth (value) {
+      const [, month] = getYearMonthDay(this.tempValue);
+      const timestamp = cloneDate(this.tempValue).setMonth(month + value);
+      // 通过.sync修饰符绑定，使用update:xxx来进行修改值
+      this.$emit('update:tempValue', new Date(timestamp));
+    }
+  }
+};
+</script>
+```
+内部会传入设置的月份，如果值为-1或者13的话，会自动切换到前一年或后一年，而不用担心时间混乱。
+
+#### 选择天
+当点击面板中的某天后，需要更新用户传入的`value`。而在`value`更新后，由于在组件内我们`watch`了`value`，所以也会同时更新`tempValue`，使页面中的数据和`value`保持一致：
+```vue
+<template>
+  <div class="go-picker-days">
+    <div class="go-date-picker-days-row" v-for="(row,i) in getDays" :key="`${row}-${i}`">
+      <div
+        class="go-date-picker-days-cell"
+        :class="dayClasses(cell)"
+        v-for="(cell,j) in row"
+        :key="`${cell}-${j}`"
+        @click="onClickDay(cell)"
+      >
+        {{ getDay(cell) }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'PickerDays',
+  // 引入混合器
+  mixins: [emitter],
+  // some code ...
+  methods: {
+    onClickDay (cell) {
+      this.dispatch('input', cell.date, 'GoDatePicker');
+    },
+    // some code...
+  }
+};
+</script>
+```
+这里用到了跨组件调用`this.$emit('input')`事件，需要从子到父一直通过`@`进行事件监听，并使用`this.$emit('input')`继续向上触发事件。为了简化这个过程，在混合器内封装了`dispatch`方法，方便跨组件之间的方法触发：
+```javascript
+// src/mixins/emitter.js
+const emitter = {
+  methods: {
+    dispatch (event, params, componentName) {
+      let parent = this.$parent;
+      while (parent) {
+        if (parent.$options.name === componentName) {
+          return parent.$emit(event, params);
+        }
+        parent = parent.$parent;
+      }
+    }
+  }
+};
+
+export default emitter;
+```
 
 ### 展示月面板
+代码中将年月日分别拆分成了不同的组件，然后通过动态组件来进行展示。
+
+月面板的界面效果如下：
+![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201029172306.png)
+
+我们在代码内部定义了数组`months`来代表所有月份，并且通过`toMatrix`转换为拥有3个子数组的二维数组，方便进行遍历：
+```vue
+<template>
+  <div class="go-picker-months">
+    <!--  some code ...  -->
+    <div class="go-date-picker-popover-content">
+      <div class="go-date-picker-months">
+        <div class="go-date-picker-months-row" v-for="(row,i) in months" :key="`${row}-${i}`">
+          <div
+            class="go-date-picker-months-cell"
+            v-for="(cell,j) in row" :key="`${cell}-${j}`"
+            :class="monthClasses(i,j)"
+            @click="onClickMonth(i,j)"
+          >
+            {{ cell }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+const MONTHS = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+export default {
+  name: 'PickerMonths',
+  data () {
+    return {
+      months: toMatrix(MONTHS, 4)
+    };
+  },
+  methods: {
+    monthClasses (i, j) {
+      const month = j + i * 4;
+      return {
+        active: this.isSameMonth(month),
+        current: this.isCurrentMonth(month)
+      };
+    },
+    onClickMonth (i, j) {
+      const month = j + i * 4;
+      const { year, day } = this.formatDate;
+      this.dispatch('input', new Date(year, month, day), 'GoDatePicker');
+      this.$emit('mode-change', 'picker-years');
+    },
+    isCurrentMonth (month) {
+      const year = this.formatDate.year;
+      const [year2, month2] = getYearMonthDay(new Date());
+      return year === year2 && month === month2;
+    },
+    isSameMonth (month) {
+      const year = this.formatDate.year;
+      const [year2, month2] = getYearMonthDay(this.value);
+      return year === year2 && month === month2;
+    }
+  }
+};
+</script>
+```
+在遍历过程中可以通过`i,j`来获取到对应项的真实月份，根据月份和`formatDate`得到的`tempValue`所对应的当前面板的年份，可以添加不同的类名，从而设置不同的样式。
+
+在点击月份后，会更新用户传入的`value`，然后跳转到年面板，下面我们来介绍年面板的实现
 
 ### 展示年面板
 
