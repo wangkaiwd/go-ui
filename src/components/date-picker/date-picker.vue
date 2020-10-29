@@ -89,12 +89,13 @@ export default {
     },
     // 42个，每行7个
     onModeChange (mode) {
-      console.log('year', mode);
-      this.mode = mode;
-      // wait all micro tasks execute complete
       setTimeout(() => {
-        this.visible = true;
+        this.mode = mode;
       });
+      // wait all micro tasks execute complete
+      // setTimeout(() => {
+      //   this.visible = true;
+      // });
     },
     changeMonth () {
       const [, month] = getYearMonthDay(this.tempValue);
@@ -121,9 +122,7 @@ export default {
     background-color: $white;
     border-radius: 6px;
     box-shadow: 0 10px 50px 0 rgba(0, 0, 0, .2);
-  }
-  .go-date-picker-months {
-    display: flex;
+    z-index: 10;
   }
 }
 </style>

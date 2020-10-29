@@ -32,7 +32,7 @@
 <script>
 import { cloneDate, getCurrentMonthLastDay, getPrevMonthLastDay, getYearMonthDay } from '@/shared/date';
 import emitter from '@/mixins/emitter';
-import { createMatrix } from '@/shared/util';
+import { toMatrix } from '@/shared/util';
 
 export default {
   name: 'PickerDays',
@@ -67,7 +67,7 @@ export default {
       const prevLastDay = getPrevMonthLastDay(year, month);
       const curLastDay = getCurrentMonthLastDay(year, month);
       const days = [...this.getPrevMonthDays(prevLastDay, startWeek), ...this.getCurrentMonthDays(curLastDay), ...this.getNextMonthDays(curLastDay, startWeek)];
-      return createMatrix(days, 7);
+      return toMatrix(days, 7);
     },
   },
   methods: {

@@ -17,7 +17,6 @@ import GoTabPane from '@/components/tabs/tab-pane';
 import GoMessage from '@/components/message/index';
 import GoUpload from '@/components/upload/upload';
 import GoDatePicker from '@/components/date-picker/date-picker';
-import GoDateRangePicker from '@/components/date-picker/date-range-picker';
 import GoTable from '@/components/table/table';
 import GoInput from '@/components/input/input';
 
@@ -34,7 +33,6 @@ Vue.component(GoTabs.name, GoTabs);
 Vue.component(GoTabPane.name, GoTabPane);
 Vue.component(GoUpload.name, GoUpload);
 Vue.component(GoDatePicker.name, GoDatePicker);
-Vue.component(GoDateRangePicker.name, GoDateRangePicker);
 Vue.component(GoTable.name, GoTable);
 Vue.component(GoInput.name, GoInput);
 

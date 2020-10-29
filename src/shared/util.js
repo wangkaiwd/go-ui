@@ -6,16 +6,16 @@ export const entries = (obj, cb) => {
 
 export const noop = () => {};
 
-export const createMatrix = (array, columnLength) => {
-  const newArray = [];
-  let temp = [];
-  array.forEach((item, i) => {
-    temp.push(item);
-    if ((i + 1) % columnLength === 0) {
-      newArray.push(temp);
-      temp = [];
+export const toMatrix = (list, elementPerSubArray) => {
+  // 通过一个索引
+  const matrix = [];
+  let k = -1;
+  list.forEach((item, i) => {
+    if (i % elementPerSubArray === 0) {
+      k++;
+      matrix[k] = [];
     }
+    matrix[k].push(item);
   });
-  if (temp.length) {newArray.push(temp);}
-  return newArray;
+  return matrix;
 };

@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { createMatrix } from '@/shared/util';
+import { toMatrix } from '@/shared/util';
 import { cloneDate, getYearMonthDay } from '@/shared/date';
 import emitter from '@/mixins/emitter';
 
@@ -50,7 +50,7 @@ export default {
   mixins: [emitter],
   data () {
     return {
-      months: createMatrix(MONTHS, 4)
+      months: toMatrix(MONTHS, 4)
     };
   },
   methods: {
