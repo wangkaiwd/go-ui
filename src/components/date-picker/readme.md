@@ -12,7 +12,7 @@
 - [x] 选择天面板
 - [x] 选择月面版
 - [x] 选择年面版
-- [x] 用户传入的日期值实现双向绑定
+- [x] 支持用户输入
 - [x] `CSS`样式美化
 
 组件的使用方式很简单，只需要传入对应的日期对象`value`即可：  
@@ -96,6 +96,7 @@ export default {
 当用户点击输入框后，首先弹出的是天面板，面板头部会显示当前的年月信息。面板主体有6行，会分别包括上月、当前月、下月的天数： 
 ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201029152243.png)
 
+#### 显示头部信息
 头部信息我们对传入的`value`进行拷贝，在内部通过`tempValue`来进行保存，并且监听`watch`的变化，保证`tempValue`可以获取到`value`的最新值。当我们在内部切换日期面板而并没有选中某个日期时，就不会更新`value`，而只是更新内部的`tempValue`属性：  
 ```vue
 <script>
@@ -132,6 +133,7 @@ export default {
 ```
 `formatDate`计算属性会通过`tempValue`计算出当前的年、月、日，方便展示。
 
+#### 显示内容区域
 内容区域的展示会复杂很多，实现的思路如下：
 * 获取当前月第一天是星期几，推导出前一个月展示的天数
 * 获取当月的展示总天数
@@ -235,3 +237,64 @@ export const getPrevMonthLastDay = (year, month) => {
 > * [Calculate last day of month in JavaScript](https://stackoverflow.com/a/13773408/12819402)
 > * [How to get the last day of the previous month in Javascript or JQuery](https://stackoverflow.com/a/37803823/12819402)
 
+在遍历展示的天的过程中，还可以通过日期信息来为其设置样式：  
+```vue
+<template>
+  <div class="go-picker-days">
+    <div class="go-date-picker-days-row" v-for="(row,i) in getDays" :key="`${row}-${i}`">
+      <div
+        class="go-date-picker-days-cell"
+        :class="dayClasses(cell)"
+        v-for="(cell,j) in row"
+        :key="`${cell}-${j}`"
+      >
+        {{ getDay(cell) }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  // some code ...
+  methods: {
+    dayClasses (cell) {
+      return {
+        prev: cell.status === 'prev',
+        next: cell.status === 'next',
+        active: this.isSameDay(cell.date, this.value),
+        today: this.isToday(cell.date)
+      };
+    },
+    // 是否是选中的天
+    isSameDay (date1, date2) {
+      const [y1, m1, d1] = getYearMonthDay(date1);
+      const [y2, m2, d2] = getYearMonthDay(date2);
+      return y1 === y2 && m1 === m2 && d1 === d2;
+    },
+    // 是否是今天
+    isToday (date) {
+      const [y1, m1, d1] = getYearMonthDay(date);
+      const [y2, m2, d2] = getYearMonthDay();
+      return y1 === y2 && m1 === m2 && d1 === d2;
+    }
+  }
+};
+</script>
+}
+```
+通过`dayClasses`方法，我们分别为添加如下`class`: 
+* `prev`: 前一个月
+* `next`: 下一个月
+* `active`: 选中的日期
+* `today`: 今天
+
+之后便可以为这些不同状态分别添加不同的样式了。
+
+#### 月份切换
+
+### 展示月面板
+
+### 展示年面板
+
+### 
