@@ -384,7 +384,7 @@ export default emitter;
 月面板的界面效果如下：
 ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201029172306.png)
 
-我们在代码内部定义了数组`months`来代表所有月份，并且通过`toMatrix`转换为拥有3个子数组的二维数组，方便进行遍历：
+我们在代码内部定义了数组`months`来代表所有月份，并且通过`toMatrix`将其转换为拥有3个子数组的二维数组，方便进行遍历：
 ```vue
 <template>
   <div class="go-picker-months">
@@ -539,7 +539,20 @@ export default {
 }
 </script>
 ```
-在点击对应的年份后，会切换到选择天面板。
+在点击对应的年份后，会更新`value`并切换到选择天面板:  
+```vue
+<script>
+export default {
+  methods: {
+    onClickYear (year) {
+      const { month, day } = this.formatDate;
+      this.dispatch('input', new Date(year, month, day), 'GoDatePicker');
+      this.$emit('mode-change', 'picker-days');
+    },
+  }
+}
+</script>
+```
 
 到这里我们已经实现年、月、天的选择，日期选择器的基本功能已经全部实现🤗。
 
