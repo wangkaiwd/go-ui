@@ -76,10 +76,9 @@ export default {
   },
   methods: {
     onClickBody (e) { // Vue内部会自动帮我们修改this指向
-      const { picker, popover } = this.$refs;
-      if (!popover) {return;}
+      const { picker} = this.$refs;
       // 过滤掉弹出层和日期选择器内的元素
-      if (picker.contains(e.target) || popover.contains(e.target)) {
+      if (picker.contains(e.target)) {
         return;
       }
       this.visible = false;
@@ -88,16 +87,16 @@ export default {
 };
 </script>
 ```
-当输入框激活时，显示弹出层，当点击外部区域时，会隐藏弹出层。需要注意的是当*点击`date-picker`内部，弹出层并不会隐藏*。
+当输入框激活时，显示弹出层，当点击外部区域时，会隐藏弹出层。需要注意的是当**点击`date-picker`内部，弹出层并不会隐藏**。
 
-`Node.contains(otherNode)`可以用来判断`otherNode`是否是`Node`的后代节点(包括`Node`本身)，返回`Boolean`。这里我们通过这个`api`来判断点击的元素`e.target`是否在`date-picker`内部，如果是的话不会隐藏弹出层，可以让用户在`date-picker`进行相应的操作。
+`Node.contains(otherNode)`可以用来判断`otherNode`是否是`Node`的后代节点(包括`Node`本身)，返回`Boolean`。这里我们通过这个`api`来判断点击的元素`e.target`是否在`date-picker`内部，如果是的话不会隐藏弹出层，可以让用户在`date-picker`中进行相应的操作。
 
 ### 展示天面板
 当用户点击输入框后，首先弹出的是天面板，面板头部会显示当前的年月信息。面板主体有6行，会分别包括上月、当前月、下月的天数： 
 ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201029152243.png)
 
 #### 显示头部信息
-头部信息我们对传入的`value`进行拷贝，在内部通过`tempValue`来进行保存，并且监听`watch`的变化，保证`tempValue`可以获取到`value`的最新值。当我们在内部切换日期面板而并没有选中某个日期时，就不会更新`value`，而只是更新内部的`tempValue`属性：  
+我们会对传入的`value`进行拷贝，在内部通过`tempValue`来进行保存，并且监听`value`的变化，保证`tempValue`可以获取到`value`的最新值。当我们在内部切换日期面板而没有选中某个日期时，就不会更新`value`，而只是更新内部的`tempValue`属性：  
 ```vue
 <script>
 export default {
@@ -151,8 +150,11 @@ export default {
   computed: {
     getDays () {
       const [year, month] = getYearMonthDay(this.tempValue);
-      // 0 ~ 6, 需要往前推 startWeek + 1天
-      const startWeek = new Date(year, month, 1).getDay();
+      // 0 ~ 6, 需要将0转换为7
+      let startWeek = new Date(year, month, 1).getDay();
+      if (startWeek === 0) {
+        startWeek = 7;
+      }
       const prevLastDay = getPrevMonthLastDay(year, month);
       const curLastDay = getCurrentMonthLastDay(year, month);
       const days = [...this.getPrevMonthDays(prevLastDay, startWeek), ...this.getCurrentMonthDays(curLastDay), ...this.getNextMonthDays(curLastDay, startWeek)];
@@ -283,13 +285,13 @@ export default {
 </script>
 }
 ```
-通过`dayClasses`方法，我们分别为添加如下`class`: 
+通过`dayClasses`方法，我们分别添加如下`class`: 
 * `prev`: 前一个月
 * `next`: 下一个月
 * `active`: 选中的日期
 * `today`: 今天
 
-之后便可以为这些不同状态分别添加不同的样式了。
+之后便可以根据`class`来为这些不同状态分别添加不同的样式了。
 
 #### 月份切换
 在面板的头部，支持点击左右箭头进行月份切换。其实现利用了`Date.prototype.setMonth`方法：
@@ -355,7 +357,7 @@ export default {
 };
 </script>
 ```
-这里用到了跨组件调用`this.$emit('input')`事件，需要从子到父一直通过`@`进行事件监听，并使用`this.$emit('input')`继续向上触发事件。为了简化这个过程，在混合器内封装了`dispatch`方法，方便跨组件之间的方法触发：
+这里进行了跨组件调用`this.$emit('input')`事件，需要从子到父一直通过`@`进行事件监听，并使用`this.$emit('input')`继续向上触发事件。为了简化这个过程，在混合器内封装了`dispatch`方法，方便跨组件之间的方法触发：
 ```javascript
 // src/mixins/emitter.js
 const emitter = {
@@ -377,7 +379,7 @@ export default emitter;
 > 如果不理解`dispatch`的实现过程的话，可以参考笔者的[这篇文章](https://zhuanlan.zhihu.com/p/242774231)
 
 ### 展示月面板
-代码中将年月日分别拆分成了不同的组件，然后通过动态组件来进行展示。
+> 代码中将年月日面板分别拆分成了不同的组件，然后通过动态组件来进行展示。
 
 月面板的界面效果如下：
 ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201029172306.png)

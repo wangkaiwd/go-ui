@@ -62,8 +62,11 @@ export default {
   computed: {
     getDays () {
       const [year, month] = getYearMonthDay(this.tempValue);
-      // 0 ~ 6, 需要往前推 startWeek + 1天
-      const startWeek = new Date(year, month, 1).getDay();
+      // 0 ~ 6, 需要将0转换为7
+      let startWeek = new Date(year, month, 1).getDay();
+      if (startWeek === 0) {
+        startWeek = 7;
+      }
       const prevLastDay = getPrevMonthLastDay(year, month);
       const curLastDay = getCurrentMonthLastDay(year, month);
       const days = [...this.getPrevMonthDays(prevLastDay, startWeek), ...this.getCurrentMonthDays(curLastDay), ...this.getNextMonthDays(curLastDay, startWeek)];
