@@ -374,7 +374,7 @@ const emitter = {
 
 export default emitter;
 ```
-> 如果不理解`dispatch`的实现过程的话，可以参考笔者的[这篇文章]()
+> 如果不理解`dispatch`的实现过程的话，可以参考笔者的[这篇文章](https://zhuanlan.zhihu.com/p/242774231)
 
 ### 展示月面板
 代码中将年月日分别拆分成了不同的组件，然后通过动态组件来进行展示。
@@ -443,11 +443,154 @@ export default {
 ```
 在遍历过程中可以通过`i,j`来获取到对应项的真实月份，根据月份和`formatDate`得到的`tempValue`所对应的当前面板的年份，可以添加不同的类名，从而设置不同的样式。
 
-在点击月份后，会更新用户传入的`value`，然后跳转到年面板，下面我们来介绍年面板的实现
+在点击月份后，会更新用户传入的`value`，然后跳转到年面板，下面我们来介绍年面板的实现。
 
 ### 展示年面板
+年面板会展示10年的年份列表，可以通过左右箭头后退或前进10年，其效果如下：  
+![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201030102412.png)
+
+我们需要计算出开始年份和结束年份，然后生成拥有4个子数组的二维数组在页面中遍历展示：  
+```vue
+<template>
+  <div class="go-picker-years">
+    <div class="go-date-picker-popover-header">
+      <span class="go-date-picker-prev" @click="changeYear(-10)">‹</span>
+      <span class="go-date-picker-info">{{ startYear }}-{{ endYear }}</span>
+      <span class="go-date-picker-next" @click="changeYear(10)">›</span>
+    </div>
+    <div class="go-date-picker-popover-content">
+      <div class="go-date-picker-years">
+        <div class="go-date-picker-years-row" v-for="(row,i) in years" :key="`${row}-${i}`">
+          <div
+            class="go-date-picker-years-cell"
+            v-for="(cell,j) in row" :key="`${cell}-${j}`"
+            :class="yearClasses(cell)"
+            @click="onClickYear(cell)"
+          >
+            {{ cell }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'PickerYears',
+  computed: {
+    startYear () {
+      const { year } = this.formatDate;
+      return year - year % 10;
+    },
+    endYear () {
+      return this.startYear + 9;
+    },
+    years () {
+      const arr = [];
+      for (let i = this.startYear; i <= this.endYear; i++) {
+        arr.push(i);
+      }
+      return toMatrix(arr, 4);
+    }
+  },
+};
+</script>
+```
+在生成年份列表后，可以根据列表中的年份信息来为其设置不同的样式：  
+```vue
+<script>
+export default {
+  methods: {
+    yearClasses (year) {
+      return {
+        active: this.isSameYear(year),
+        current: this.isCurrentYear(year)
+      };
+    },
+    // 当前所处年分
+    isCurrentYear (year) {
+      const [year2] = getYearMonthDay(new Date());
+      return year === year2;
+    },
+    // 与用户传入的value相同的激活年份
+    isSameYear (year) {
+      const [year2] = getYearMonthDay(this.value);
+      return year === year2;
+    }
+  }
+}
+</script>
+```
+
+当点击左右箭头时，会调用`Date.prototype.setFullYear`来进行年份的切换：  
+```vue
+<script>
+export default {
+  methods: {
+    changeYear (value) {
+      const [year] = getYearMonthDay(this.tempValue);
+      const timestamp = cloneDate(this.tempValue).setFullYear(year + value);
+      this.$emit('update:tempValue', new Date(timestamp));
+    },
+  }
+}
+</script>
+```
+在点击对应的年份后，会切换到选择天面板。
+
+到这里我们已经实现年、月、天的选择，日期选择器的基本功能已经全部实现🤗。
 
 ### 输入当前日期
+用户不仅可以通过面板可以选择时间，也可以通过输入框来输入时间。
+
+当用户在输入框中输入内容后，会将用户输入的内容与正则进行匹配，如果匹配不成功将会忽略用户的输入内容。如果匹配成功，会通过正则单元将用户填写的年月日拿到，然后用它们更新用户传入的`value`，进而更新整个日期选择器的数据。
+
+上述逻辑的代码如下：  
+```vue
+<template>
+  <div class="go-date-picker" ref="picker">
+    <go-input
+      class="go-date-picker-input"
+      @focus="visible=true"
+      v-model="displayValue"
+      prefix="calendar"
+      placeholder="请选择时间"
+    >
+    </go-input>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'GoDatePicker',
+  computed: {
+    displayValue: {
+      get () {
+        const [year, month, day] = getYearMonthDay(this.value);
+        return `${year}-${month + 1}-${day}`;
+      },
+      set (e) { // 为计算属性绑定set方法，在更新值的时候会调用
+        if (e?.target?.value) {
+          const reg = /(\d+)-(\d+)-(\d+)/;
+          const value = e.target.value;
+          const matched = value.match(reg);
+          if (matched) { // 如果匹配到的话，通过正则单元获取到年月日更新value
+            const [, year, month, day] = matched;
+            this.$emit('input', new Date(year, month - 1, day));
+          }
+        }
+      }
+    },
+  },
+};
+</script>
+```
+在输入框中输入内容的时候，由于为计算属性`displayValue`设置了`v-model`，所以需要为其设置`set`方法。在`set`方法中通过`String.prototype.match`获取匹配结果，进而更新`value`。
+
+这个功能可以让我们直接输入日期信息，而不用为了选择某个跨度比较大的时间而进行不停的前进后退操作。
 
 ### 结语
-日期选择器的难点在于年、月、天列表的展示，需要我们对`Date`的一些`api`有一定的了解，否则会导致很多没有必要的计算逻辑。
+日期选择器的难点在于年、月、天列表的展示，需要我们对`Date`的一些`api`有一定的了解，否则会导致很多没有必要的计算逻辑。剩下的一些`CSS`样式比较简单，需要花些耐心多去调试。
+
+希望这篇文章能够帮助你了解日期选择器的实现原理，在工作和面试时更加游刃有余！
