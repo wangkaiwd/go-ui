@@ -1,4 +1,5 @@
 ## `Vue`实战：日期选择器
+![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/Peach%20and%20Blue%20Illustration%20English%20Class%20Education%20Presentation.png)
 > * [源码地址](https://github.com/wangkaiwd/go-ui/blob/master/src/components/date-picker/date-picker.vue)
 > * [`demo`演示](http://localhost:8080/#/date-picker)
 
