@@ -23,6 +23,11 @@ export const routes = [
       { path: '/message', name: 'Message', component: () => import('@/demo/message/message') },
       { path: '/upload', name: 'Upload', component: () => import('@/demo/upload/upload') },
       { path: '/date-picker', name: 'DatePicker', component: () => import('@/demo/date-picker/date-picker') },
+      {
+        path: '/infinite-scroll',
+        name: 'InfiniteScroll',
+        component: () => import('@/demo/infinite-scroll/infinite-scroll')
+      },
     ]
   }
 ];

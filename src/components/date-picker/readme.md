@@ -1,7 +1,7 @@
 ## `Vue`实战：日期选择器
 ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/Peach%20and%20Blue%20Illustration%20English%20Class%20Education%20Presentation.png)
 > * [源码地址](https://github.com/wangkaiwd/go-ui/blob/master/src/components/date-picker/date-picker.vue)
-> * [`demo`演示](http://localhost:8080/#/date-picker)
+> * [`demo`演示](https://wangkaiwd.github.io/go-ui/#/date-picker)
 
 在日常工作中需要填写日期的时候，会用到日期选择器，来方便的进行日、月、年的选择。这里我们会用`Vue`来实现一个日期选择器，效果如下：
 <p align="center">

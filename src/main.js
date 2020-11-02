@@ -19,6 +19,7 @@ import GoUpload from '@/components/upload/upload';
 import GoDatePicker from '@/components/date-picker/date-picker';
 import GoTable from '@/components/table/table';
 import GoInput from '@/components/input/input';
+import InfiniteScroll from '@/components/infinite-scroll/index';
 
 Vue.component(GoButton.name, GoButton);
 Vue.component(GoIcon.name, GoIcon);
@@ -42,6 +43,7 @@ Vue.use(GoLazyLoad, {
   loading: require('@/demo/lazy-load/loading.png')
 });
 Vue.use(GoMessage);
+Vue.use(InfiniteScroll);
 Vue.config.productionTip = false;
 
 new Vue({
