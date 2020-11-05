@@ -1,21 +1,26 @@
-const key = '_infinite-scroll';
-const getScrollParent = (el) => {
-  let parent = el;
-  while (parent) {
-    if (parent === window) {
-      return parent;
+const scope = 'GoInfiniteScroll';
+// set default props for components
+// user will pass it by html attributes
+const defaultProps = {
+
+};
+const getContainer = (el) => {
+  let container = el;
+  while (container) {
+    if (container === document) {
+      return container;
     }
     const { overflow, overflowY } = getComputedStyle(el);
     const reg = /auto|scroll/;
     // 找出最近的滚动父元素
     if (reg.test(overflow) || reg.test(overflowY)) {
-      return parent;
+      return container;
     }
-    parent = parent.parentNode;
+    container = container.parentNode;
   }
 };
 const loadData = (parent, el, load) => {
-  const loadHeight = parent.scrollTop + el[key].infiniteScrollDistance + parent.offsetHeight;
+  const loadHeight = parent.scrollTop + el[scope].infiniteScrollDistance + parent.offsetHeight;
   const scrollHeight = parent.scrollHeight;
   if (scrollHeight <= loadHeight) {
     load();
@@ -30,10 +35,13 @@ const install = (Vue) => {
     bind (el, binding) {
       Vue.nextTick(() => {
         const infiniteScrollDistance = Number(el.getAttribute('infinite-scroll-distance'));
-        el[key] = { infiniteScrollDistance };
-        const parent = getScrollParent(el);
-        parent.addEventListener('scroll', onScroll.bind(parent, el, binding.value));
+        el[scope] = { infiniteScrollDistance };
+        const container = getContainer(el);
+        container.addEventListener('scroll', onScroll.bind(container, el, binding.value));
       });
+    },
+    unbind (el) {
+
     }
   });
 };
