@@ -7,6 +7,10 @@
 * 禁用更新
 * 优化滚动事件
 
+### 用法
+* 通过`html`属性传入用户参数，用来控制组件的不同行为
+* 触底加载更多
+
 ### 原理
 * 找到设置`v-infinite-scroll`指令指定的元素以及距其最近的滚动的父元素
 * 用户会传入滚动距离`distance`
@@ -20,5 +24,7 @@
   * 可以定义一个`scope`,其值为`GoInfiniteScroll`，之后会将所有的全局共享的信息都作为对象放到`el[scope]`中，方便在不同函数和自定义指令生命周期中使用
   * [define](https://github.com/wangkaiwd/js-deep/blob/cd2c105b2b75199df4041186f644ca31eba651a7/advanced/vue-usage/vue-components/src/components/directives/infinite-scroll.js#L46)
   * [usage](https://github.com/wangkaiwd/js-deep/blob/cd2c105b2b75199df4041186f644ca31eba651a7/advanced/vue-usage/vue-components/src/components/directives/infinite-scroll.js#L59-L6)
-* 整理其核心思路
+* 整理其核心思路:
+  1. 触底加载
+  2. 首屏加载
   
