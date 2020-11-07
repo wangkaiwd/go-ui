@@ -5,6 +5,7 @@
         tag="li"
         class="menu-item"
         v-for="menu in menus"
+        :key="menu.path"
         :class="{active: menu.path === $route.path}"
         :to="menu.path"
       >
