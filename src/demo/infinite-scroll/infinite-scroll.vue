@@ -3,9 +3,14 @@
     <ul
       class="list"
       v-infinite-scroll="load"
-      infinite-scroll-distance="40"
+      :infinite-scroll-disabled="disabled"
+      :infinite-scroll-immediate="true"
     >
       <li class="item" v-for="i in count" :key="i">{{ i }}</li>
+      <li style="text-align:center" v-if="disabled && hasMore">loading...</li>
+      <li style="text-align:center" v-if="!hasMore">
+        no more!
+      </li>
     </ul>
   </div>
 </template>
@@ -15,12 +20,21 @@ export default {
   name: 'InfiniteScroll',
   data () {
     return {
-      count: 40
+      count: 3,
+      disabled: false,
+      hasMore: true
     };
   },
   methods: {
     load () {
-      console.log('load');
+      if (this.count >= 40) {
+        return this.hasMore = false;
+      }
+      this.disabled = true;
+      setTimeout(() => {
+        this.disabled = false;
+        this.count += 2;
+      }, 1000);
     }
   }
 };

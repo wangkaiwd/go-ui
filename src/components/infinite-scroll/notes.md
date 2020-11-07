@@ -25,6 +25,11 @@
   * [define](https://github.com/wangkaiwd/js-deep/blob/cd2c105b2b75199df4041186f644ca31eba651a7/advanced/vue-usage/vue-components/src/components/directives/infinite-scroll.js#L46)
   * [usage](https://github.com/wangkaiwd/js-deep/blob/cd2c105b2b75199df4041186f644ca31eba651a7/advanced/vue-usage/vue-components/src/components/directives/infinite-scroll.js#L59-L6)
 * 整理其核心思路:
-  1. 触底加载
-  2. 首屏加载
-  
+  1. 触底加载(比较重要的几个api,可以结合`mdn`底部的示意图进行理解)：
+    * scrollHeight
+    * offsetHeight
+    * scrollTop
+  2. 首屏加载:
+    * 通过`MutationObserver`监听`container`的子元素变化
+    * 先手动触发一次`scrollHandler`来引发`MutationObserver`的监听效果
+  3. 滚动事件优化 
