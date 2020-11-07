@@ -19,20 +19,23 @@ const getContainer = (el) => {
     container = container.parentNode;
   }
 };
-const getOptions = (el) => {
+const getOptions = (el, vm) => {
   return Object.entries(defaultProps).reduce((options, [key, val]) => {
-    options[key] = el.getAttribute(`infinite-scroll-${key}`) ?? val;
+    const attr = el.getAttribute(`infinite-scroll-${key}`);
+    options[key] = vm[attr] ?? val;
     return options;
   }, {});
 };
 
 function scrollHandler (el, load, e) {
   // 1. 如果没有加载到指定高度，就会调用load方法进行加载
-  const { distance, disabled } = getOptions(el);
+  const { vm } = el[scope];
+  const { disabled, distance } = getOptions(el, vm);
   if (disabled) {return;}
   const loadHeight = this.offsetHeight + Number(distance) + this.scrollTop;
   const scrollHeight = this.scrollHeight;
   if (scrollHeight <= loadHeight) {
+    console.log('load');
     load();
   }
 }
@@ -54,12 +57,13 @@ function throttle (fn, delay) {
 const install = (Vue) => {
   Vue.directive('infinite-scroll', {
     name: scope,
-    bind (el, binding) { // Only called once, when the directive is first bound to the element. This is where you can do one-time setup work
+    bind (el, binding, VNode) { // Only called once, when the directive is first bound to the element. This is where you can do one-time setup work
       Vue.nextTick(() => {
         const container = getContainer(el);
-        const { immediate } = getOptions(el);
-        const onScroll = throttle(scrollHandler, 200).bind(container, el, binding.value);
-        el[scope] = { container, onScroll };
+        const vm = VNode.context;
+        const { immediate, delay } = getOptions(el, vm);
+        const onScroll = throttle(scrollHandler, delay).bind(container, el, binding.value);
+        el[scope] = { container, onScroll, vm };
         if (immediate) {
           const observer = new MutationObserver(onScroll);
           el[scope].observe = observer.observe(container, {
