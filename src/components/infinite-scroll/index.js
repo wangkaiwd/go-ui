@@ -27,16 +27,19 @@ const getOptions = (el, vm) => {
   }, {});
 };
 
-function scrollHandler (el, load, e) {
+function scrollHandler (el, load) {
   // 1. 如果没有加载到指定高度，就会调用load方法进行加载
-  const { vm } = el[scope];
+  const { vm, observer } = el[scope];
   const { disabled, distance } = getOptions(el, vm);
   if (disabled) {return;}
-  const loadHeight = this.offsetHeight + Number(distance) + this.scrollTop;
+  const loadHeight = this.offsetHeight + distance + this.scrollTop;
   const scrollHeight = this.scrollHeight;
   if (scrollHeight <= loadHeight) {
-    console.log('load');
     load();
+  }
+  if ((scrollHeight > loadHeight) && observer) {
+    observer.disconnect();
+    el[scope].observer = null;
   }
 }
 
@@ -65,8 +68,10 @@ const install = (Vue) => {
         const onScroll = throttle(scrollHandler, delay).bind(container, el, binding.value);
         el[scope] = { container, onScroll, vm };
         if (immediate) {
-          const observer = new MutationObserver(onScroll);
-          el[scope].observe = observer.observe(container, {
+          const observer = el[scope].observer = new MutationObserver(() => {
+            return onScroll();
+          });
+          observer.observe(container, {
             childList: true,
             subtree: true
           });
@@ -76,10 +81,10 @@ const install = (Vue) => {
       });
     },
     unbind (el) {
-      const { container, onScroll, observe } = el[scope];
+      const { container, onScroll, observer } = el[scope];
       container.removeEventListener('scroll', onScroll);
-      if (observe) {
-        observe.disconnect();
+      if (observer) {
+        observer.disconnect();
       }
     }
   });

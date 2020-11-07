@@ -3,8 +3,8 @@
     <ul
       class="list"
       v-infinite-scroll="load"
-      :infinite-scroll-disabled="disabled"
-      :infinite-scroll-immediate="true"
+      infinite-scroll-disabled="disabled"
+      infinite-scroll-immediate="immediate"
     >
       <li class="item" v-for="i in count" :key="i">{{ i }}</li>
       <li style="text-align:center" v-if="disabled && hasMore">loading...</li>
@@ -22,7 +22,8 @@ export default {
     return {
       count: 3,
       disabled: false,
-      hasMore: true
+      hasMore: true,
+      immediate: true
     };
   },
   methods: {
@@ -32,8 +33,8 @@ export default {
       }
       this.disabled = true;
       setTimeout(() => {
-        this.disabled = false;
         this.count += 2;
+        this.disabled = false;
       }, 1000);
     }
   }
