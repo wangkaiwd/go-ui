@@ -20,25 +20,33 @@ const getContainer = (el) => {
   }
 };
 const getOptions = (el) => {
-
-  // Object.entries(([key,val]) => {
-  //
-  // })
+  return Object.entries(defaultProps).reduce((options, [key, val]) => {
+    options[key] = el.getAttribute(`infinite-scroll-${key}`) ?? val;
+    return options;
+  }, {});
 };
 
-function handleScroll (e) {
+function handleScroll (el, load, e) {
   // 1. 如果没有加载到指定高度，就会调用load方法进行加载
-
+  const { distance } = getOptions(el);
+  const loadHeight = this.offsetHeight + Number(distance) + this.scrollTop;
+  const scrollHeight = this.scrollHeight;
+  if (scrollHeight <= loadHeight) {
+    load();
+  }
 }
 
 const install = (Vue) => {
-  Vue.directive(scope, {
+  Vue.directive('infinite-scroll', {
     name: scope,
     bind (el, binding) { // Only called once, when the directive is first bound to the element. This is where you can do one-time setup work
       Vue.nextTick(() => {
         const container = getContainer(el);
-        // const onScroll = handleScroll.bind(container);
-        container.addEventListener('scroll', handleScroll);
+        const onScroll = handleScroll.bind(container, el, binding.value);
+        el[scope] = {
+          container
+        };
+        container.addEventListener('scroll', onScroll);
       });
     }
   });
