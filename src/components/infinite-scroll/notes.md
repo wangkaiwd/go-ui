@@ -36,5 +36,5 @@
 
 #### 注意
 * 要通过自定义指定的第三个参数`VNode.context`来获取到`vm`,然后从组件中获取对应的参数
-* 首屏加载完成后，要取消`MutationObserver`的事件监听
+* 首屏加载完成后，要[取消`MutationObserver`的事件监听](https://github.com/wangkaiwd/go-ui/blob/f734d5c7bf094f1f2ad4e16e820e0529ea3d2925/src/components/infinite-scroll/index.js#L40-L43)
 * 需要注意的是，用户通过`HTML`属性传入的内容是字符串
