@@ -1,9 +1,10 @@
+![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/Blue%20Marketing%20Start-up%20Business%20Facebook%20Cover.png)
 ## 无限滚动组件
-> * 源码地址
-> * `demo`演示
+> * [源码地址](https://github.com/wangkaiwd/go-ui/blob/master/src/components/infinite-scroll/index.js)
+> * [`demo`演示](https://wangkaiwd.github.io/go-ui/#/infinite-scroll)
 
-组件效果如下：
-![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/2020-11-25-11%3A32.gif)
+组件效果如下：  
+![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/2020-11-25-11%3A32.gif)  
 当我们滚动列表内容到底部的时候，会自动加载新的内容到列表容器中，而不是一次性请求所有内容。
 
 下面我们会通过`Vue`中的自定义指令来一步步实现该组件。
@@ -82,17 +83,17 @@ const install = (Vue) => {
 };
 ```
 
-当用户为元素绑定了`v-infinite-scroll`指令后，组件中会进行如下逻辑：
+当用户为元素绑定了`v-infinite-scroll`指令后，组件中会执行如下逻辑：
 * 找到元素对应的最近的设置滚动的父元素
 * 处理用户传入的配置项
 * 为父元素添加滚动事件
-* 当用户滚动时，要计算列表内容是否小于："容器的高度" + "容器被卷去的高度(`scrollTop`)" + "列表的预加载距离"，如果小于会执行`load`方法进行加载
+* 当用户滚动时，要计算列表内容是否小于："容器的高度" + "容器被卷去的高度(`scrollTop`)" + "列表的预加载距离"，如果小于会执行`load`方法进行数据加载
 
 下面画图来解释下这个逻辑：
 ![](https://raw.githubusercontent.com/wangkaiwd/drawing-bed/master/20201125144455.png)
 
 ### 滚动到底部加载列表元素
-在自定义指令的`bind`钩子函数中，我们可以拿到绑定指令的元素:`el`，找到容器元素，并且会处理用户传入的配置项来配合后续逻辑的书写。最后为容器元素绑定`scroll`事件，实现滚动到底部加载加载列表元素。
+在自定义指令的`bind`钩子函数中，我们可以拿到绑定指令的元素:`el`，找到容器元素，并且会处理用户传入的配置项来配合后续逻辑的书写。最后为容器元素绑定`scroll`事件，实现滚动到底部加载列表元素。
 ```javascript
 const install = (Vue) => {
   Vue.directive('infinite-scroll', {
@@ -183,7 +184,7 @@ function scrollHandler (el, load) {
 由于滚动事件触发过于频繁，在代码中对其进行了节流操作：在前一个定时器没有完成前，不会再设置新的定时器。这样保证了在特定时间内，滚动事件只会触发一次。
 
 ### 首次数据填满屏幕
-当用户传入`infinite-scroll-immediate`属性传入`true`时，会自动将列表数据加载至充满当前"容器区域 + 预加载区域(`distance`)"。
+当用户`infinite-scroll-immediate`属性传入`true`时，会自动将列表数据加载至充满当前"容器区域 + 预加载区域(`distance`)"。
 
 这里我们使用`MutationObserver`来帮助我们监听容器元素中子元素的内容变化，当其内容发生变化，便执行`load`方法进行加载数据。加载数据后会继续导致容器子元素发生变化，进而继续触发`load`事件，直到充满"容器"。
 ```javascript
@@ -214,7 +215,7 @@ const install = (Vue) => {
   });
 };
 ```
-这里我们在`el[scope]`对象中添加了`observer`属性，之后可以在首屏加载完毕后将`observer`断开连接，防止对事件进行不必要的触发：
+这里我们在`el[scope]`对象中添加了`observer`属性，之后可以在首屏加载完毕后将`observer`断开连接，并将其设置为`null`，防止对事件进行不必要的触发：
 ```javascript
 function scrollHandler (el, load) {
   // 1. 如果没有加载到指定高度，就会调用load方法进行加载
@@ -239,6 +240,6 @@ function scrollHandler (el, load) {
 ### 结语
 代码与实现参考了[`element ui`](https://github.com/ElemeFE/element/blob/dev/packages/infinite-scroll/src/main.js) ,感兴趣的小伙伴可以去阅读源码。
 
-组件的实现主要是依赖于原生`dom`操作，一步步实现组件可以帮助我们很好的巩固和掌握原生`dom`操作的相关知识点。希望在看完本篇教程后，大家能掌握组件实现的核心思路，可以自己实现组件。
+组件的实现主要是依赖于原生`dom`操作，一步步实现组件可以帮助我们很好的巩固和掌握原生`dom`操作的相关知识点。希望在看完本篇教程后，大家能掌握组件实现的核心思路，可以自己从零到一实现组件。
 
 最后，如果文章内容对你有帮助的话，请点赞鼓励一下作者😬!
