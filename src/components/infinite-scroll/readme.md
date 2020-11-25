@@ -214,6 +214,31 @@ const install = (Vue) => {
   });
 };
 ```
+这里我们在`el[scope]`对象中添加了`observer`属性，之后可以在首屏加载完毕后将`observer`断开连接，防止对事件进行不必要的触发：
+```javascript
+function scrollHandler (el, load) {
+  // 1. 如果没有加载到指定高度，就会调用load方法进行加载
+  const { vm, observer } = el[scope];
+  const { disabled, distance } = getOptions(el, vm);
+  if (disabled) {return;}
+  const loadHeight = this.offsetHeight + distance + this.scrollTop;
+  const scrollHeight = this.scrollHeight;
+  if (scrollHeight <= loadHeight) {
+    load();
+  }
+  // 首屏加载完成后，如果有observer属性，将其断开连接，并且置为null
+  if ((scrollHeight > loadHeight) && observer) {
+    observer.disconnect();
+    el[scope].observer = null;
+  }
+}
+```
+
 这样就可以先帮用户将首屏数据加载完毕，之后在滚动到底部后继续加载新内容。
 
 ### 结语
+代码与实现参考了[`element ui`](https://github.com/ElemeFE/element/blob/dev/packages/infinite-scroll/src/main.js) ,感兴趣的小伙伴可以去阅读源码。
+
+组件的实现主要是依赖于原生`dom`操作，一步步实现组件可以帮助我们很好的巩固和掌握原生`dom`操作的相关知识点。希望在看完本篇教程后，大家能掌握组件实现的核心思路，可以自己实现组件。
+
+最后，如果文章内容对你有帮助的话，请点赞鼓励一下作者😬!
