@@ -1,9 +1,9 @@
 const scope = 'GoInfiniteScroll';
 const defaultProps = {
   disabled: false,
-  distance: 40,
+  distance: 0,
   immediate: true,
-  delay: 300
+  delay: 200
 };
 const getContainer = (el) => {
   let container = el;

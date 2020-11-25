@@ -1,17 +1,19 @@
 <template>
   <div class="infinite-scroll">
-    <ul
-      class="list"
-      v-infinite-scroll="load"
-      infinite-scroll-disabled="disabled"
-      infinite-scroll-immediate="immediate"
-    >
-      <li class="item" v-for="i in count" :key="i">{{ i }}</li>
-      <li style="text-align:center" v-if="disabled && hasMore">loading...</li>
-      <li style="text-align:center" v-if="!hasMore">
+    <div class="list">
+      <ul
+        v-infinite-scroll="load"
+        infinite-scroll-distance="60"
+        infinite-scroll-disabled="disabled"
+        infinite-scroll-immediate="immediate"
+      >
+        <li class="item" v-for="i in count" :key="i">{{ i }}</li>
+      </ul>
+      <p class="load-text" v-if="disabled && hasMore">loading...</p>
+      <p class="load-text" v-if="!hasMore">
         no more!
-      </li>
-    </ul>
+      </p>
+    </div>
   </div>
 </template>
 
@@ -20,7 +22,7 @@ export default {
   name: 'InfiniteScroll',
   data () {
     return {
-      count: 3,
+      count: 0,
       disabled: false,
       hasMore: true,
       immediate: true
@@ -33,7 +35,7 @@ export default {
       }
       this.disabled = true;
       setTimeout(() => {
-        this.count += 2;
+        this.count += 5;
         this.disabled = false;
       }, 1000);
     }
@@ -43,6 +45,14 @@ export default {
 
 <style lang="scss" scoped>
 .infinite-scroll {
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+  .load-text {
+    text-align: center;
+    padding: 12px;
+  }
   .list {
     height: 460px;
     width: 400px;
@@ -53,7 +63,8 @@ export default {
     background-color: #4285f3;
     color: #fff;
     text-align: center;
-    padding: 12px 0;
+    height: 50px;
+    line-height: 50px;
   }
   .item + .item {
     margin-top: 8px;
