@@ -180,4 +180,40 @@ function scrollHandler (el, load) {
   }
 }
 ```
-由于滚动事件触发过于频繁，在代码中对其进行了节流操作：在前一个定时器没有完成前，不会再设置新的定时器。这样保证了再特定时间内，滚动事件只会触发一次。
+由于滚动事件触发过于频繁，在代码中对其进行了节流操作：在前一个定时器没有完成前，不会再设置新的定时器。这样保证了在特定时间内，滚动事件只会触发一次。
+
+### 首次数据填满屏幕
+当用户传入`infinite-scroll-immediate`属性传入`true`时，会自动将列表数据加载至充满当前"容器区域 + 预加载区域(`distance`)"。
+
+这里我们使用`MutationObserver`来帮助我们监听容器元素中子元素的内容变化，当其内容发生变化，便执行`load`方法进行加载数据。加载数据后会继续导致容器子元素发生变化，进而继续触发`load`事件，直到充满"容器"。
+```javascript
+const install = (Vue) => {
+  Vue.directive('infinite-scroll', {
+    name: scope,
+    bind (el, binding, VNode) {
+      Vue.nextTick(() => {
+        const container = getContainer(el);
+        const vm = VNode.context;
+        const { immediate, delay } = getOptions(el, vm);
+        const onScroll = throttle(scrollHandler, delay).bind(container, el, binding.value);
+        el[scope] = { container, onScroll, vm };
+        // 如果传入immediate，首次会先将内容加载至充满"容器"
+        if (immediate) {
+          const observer = el[scope].observer = new MutationObserver(onScroll);
+          // 监听子节点的变化
+          observer.observe(container, {
+            childList: true,
+            subtree: true
+          });
+          // 先手动加载一次数据
+          onScroll();
+        }
+        container.addEventListener('scroll', onScroll);
+      });
+    },
+  });
+};
+```
+这样就可以先帮用户将首屏数据加载完毕，之后在滚动到底部后继续加载新内容。
+
+### 结语
