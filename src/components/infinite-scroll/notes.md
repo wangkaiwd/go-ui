@@ -23,7 +23,7 @@
 * 跨函数之间共享变量(参考`element ui`)：
   * 可以定义一个`scope`,其值为`GoInfiniteScroll`，之后会将所有的全局共享的信息都作为对象放到`el[scope]`中，方便在不同函数和自定义指令生命周期中使用
   * [define](https://github.com/wangkaiwd/js-deep/blob/cd2c105b2b75199df4041186f644ca31eba651a7/advanced/vue-usage/vue-components/src/components/directives/infinite-scroll.js#L46)
-  * [usage](https://github.com/wangkaiwd/js-deep/blob/cd2c105b2b75199df4041186f644ca31eba651a7/advanced/vue-usage/vue-components/src/components/directives/infinite-scroll.js#L59-L6)
+  * [usage](https://github.com/wangkaiwd/js-deep/blob/cd2c105b2b75199df4041186f644ca31eba651a7/advanced/vue-usage/vue-components/src/components/directives/infinite-scroll.js#L58-L63)
 * 整理其核心思路:
   1. 触底加载(比较重要的几个api,可以结合`mdn`底部的示意图进行理解)：
     * scrollHeight
